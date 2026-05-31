@@ -13,11 +13,11 @@ jobs:
       - name: Ping Streamlit Apps
         run: |
           echo "Pinging AI Document Search..."
-          curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+          curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
             -o /dev/null -w "AI-Document-Search Status: %{http_code}\n" \
-            https://aidoc-rishiware.streamlit.app/
+            https://aidoc-rishiware.streamlit.app/ || true
 
           echo "Pinging Custom AI Agent..."
-          curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+          curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
             -o /dev/null -w "Custom-AI-Agent Status: %{http_code}\n" \
-            https://aiagent-rishiware.streamlit.app/
+            https://aiagent-rishiware.streamlit.app/ || true
