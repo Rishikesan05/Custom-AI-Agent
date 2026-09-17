@@ -136,7 +136,3 @@ The agent uses a simple but effective memory system:
 1. **Save Memory**: When the agent identifies important information (preferences, facts, context), it saves it to a vector store scoped to the user
 2. **Recall Memory**: Before responding, the agent searches its memory for relevant past interactions
 3. **Context Enrichment**: Retrieved memories are injected into the conversation context, enabling personalized responses
-
-## License
-
-MIT
