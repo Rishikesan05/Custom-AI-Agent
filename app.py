@@ -16,25 +16,26 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── CSS Design System (Linear.app Style) ──
+# ── CSS Design System (Light Sleek & Premium) ──
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
     :root {
-        --canvas: #010102;
-        --surface-1: #0f1011;
-        --surface-2: #141516;
-        --surface-3: #18191a;
-        --hairline: #23252a;
-        --primary: #5e6ad2;
-        --primary-hover: #828fff;
-        --ink: #f7f8f8;
-        --ink-muted: #d0d6e0;
-        --ink-subtle: #8a8f98;
-        --radius: 8px;
-        --radius-lg: 12px;
-        --shadow-linear: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --canvas: #f8fafc;
+        --surface-1: #ffffff;
+        --surface-2: #f1f5f9;
+        --surface-3: #e2e8f0;
+        --hairline: #e2e8f0;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --ink: #0f172a;
+        --ink-muted: #475569;
+        --ink-subtle: #94a3b8;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --shadow-linear: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
     }
 
     * {
@@ -64,22 +65,21 @@ st.markdown("""
         border-radius: var(--radius) !important;
         padding: 16px 20px !important;
         margin-bottom: 12px !important;
-        font-size: 14px;
+        font-size: 14.5px;
         line-height: 1.6;
         border: 1px solid transparent !important;
     }
 
     /* User Message (Inset) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
-        background: transparent !important;
-        border-color: var(--hairline) !important;
+        background: var(--surface-2) !important;
     }
 
     /* AI Message (Surface-1) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
         background: var(--surface-1) !important;
-        border-color: var(--hairline) !important;
         box-shadow: var(--shadow-linear) !important;
+        border-color: var(--hairline) !important;
     }
 
     /* Chat Input submit button & icons */
@@ -93,17 +93,17 @@ st.markdown("""
 
     /* Chat Input Container */
     .stChatInput > div {
-        border-radius: var(--radius-lg) !important;
+        border-radius: 20px !important;
         border: 1px solid var(--hairline) !important;
         background: var(--surface-1) !important;
         transition: all 0.2s ease;
         padding: 4px 8px !important;
-        box-shadow: 0 12px 24px rgba(0,0,0,0.6) !important;
+        box-shadow: var(--shadow-linear) !important;
     }
 
     .stChatInput > div:focus-within {
         border-color: var(--primary) !important;
-        box-shadow: 0 0 0 1px var(--primary) !important;
+        box-shadow: var(--shadow-hover) !important;
     }
 
     .stChatInput textarea {
@@ -118,21 +118,24 @@ st.markdown("""
     .stButton > button,
     [data-testid="stDownloadButton"] > button {
         border-radius: var(--radius) !important;
-        padding: 6px 14px !important;
+        padding: 8px 14px !important;
         font-weight: 500 !important;
-        font-size: 13px !important;
+        font-size: 13.5px !important;
         transition: all 0.2s ease;
         cursor: pointer;
-        background: var(--surface-2) !important;
-        color: var(--ink) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink-muted) !important;
         border: 1px solid var(--hairline) !important;
+        box-shadow: var(--shadow-linear) !important;
     }
 
     .stButton > button:hover,
     [data-testid="stDownloadButton"] > button:hover {
-        background: var(--surface-3) !important;
-        border-color: var(--ink-subtle) !important;
-        color: #ffffff !important;
+        background: var(--surface-1) !important;
+        border-color: var(--primary) !important;
+        color: var(--primary) !important;
+        box-shadow: var(--shadow-hover) !important;
+        transform: translateY(-1px);
     }
 
     /* Hero Section */
@@ -173,7 +176,7 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Feature Cards Grid (Removed, but keeping generic grid styles for buttons if needed) */
+    /* Generic Grid Styles for Buttons */
     .stButton > button {
         width: 100%;
         text-align: left;
@@ -184,7 +187,7 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     .sidebar-item:hover {
-        background: var(--surface-2) !important;
+        background: var(--surface-3) !important;
         color: var(--primary) !important;
     }
 
