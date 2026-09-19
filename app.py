@@ -1461,16 +1461,9 @@ if "user" in st.query_params:
     except Exception:
         pass
 
-# 2. Derive unique session ID for default private isolation
+# 2. Stable default vault so memories persist across refreshes without disappearing
 if "user_profile_id" not in st.session_state:
-    try:
-        from streamlit.runtime.scriptrunner import get_script_run_ctx
-        ctx = get_script_run_ctx()
-        s_raw = ctx.session_id if ctx else str(time.time())
-        s_hash = hashlib.md5(s_raw.encode()).hexdigest()[:8]
-    except Exception:
-        s_hash = uuid.uuid4().hex[:8]
-    st.session_state.user_profile_id = f"s_{s_hash}"
+    st.session_state.user_profile_id = "default"
 
 current_uid = st.session_state.user_profile_id
 
@@ -1613,34 +1606,42 @@ with st.sidebar:
             st.rerun()
 
     with st.expander("Vault Sync & Privacy", expanded=False):
+        vault_label = "Default (Local)" if current_uid == "default" else current_uid
         st.markdown(f"""
         <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 8px;">
-            <div><strong>Active Vault:</strong> <code>{current_uid}</code></div>
-            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">URL is 100% clean and private. To sync your memories across multiple devices without exposing anything in the URL, enter your private Vault Key below.</div>
+            <div><strong>Active Vault:</strong> <code style="color: var(--brand-primary);">{vault_label}</code></div>
+            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">URL is 100% clean & private. To access your memories across devices, enter your secret Vault Key.</div>
         </div>
         """, unsafe_allow_html=True)
 
-        vault_key_val = st.text_input(
-            "Private Vault Passphrase",
-            value=st.session_state.get("custom_vault_key", ""),
-            placeholder="e.g. rishi-vault",
-            help="Enter your private key to sync memories across devices safely.",
-            label_visibility="collapsed"
-        )
-        col_v1, col_v2 = st.columns(2)
-        with col_v1:
-            if st.button("Connect Key", icon=":material/key:", use_container_width=True, key="btn_connect_vault"):
+        with st.form(key="vault_key_form", border=False):
+            vault_key_val = st.text_input(
+                "Private Vault Key",
+                value=st.session_state.get("custom_vault_key", ""),
+                placeholder="e.g. rishi-vault",
+                help="Enter your private key to sync memories across devices safely.",
+                label_visibility="collapsed"
+            )
+            if st.form_submit_button("Connect Vault Key", icon=":material/key:", use_container_width=True):
                 clean_key = "".join(c for c in vault_key_val.strip() if c.isalnum() or c in ("-", "_")).lower()
                 if clean_key:
                     st.session_state.custom_vault_key = clean_key
                     st.session_state.user_profile_id = f"v_{clean_key}"
                     st.session_state.memory_store = MemoryStore(user_id=st.session_state.user_profile_id)
-                    st.toast(f"Connected to private vault: {clean_key}")
+                    st.toast(f"Connected to vault: {clean_key}")
                     st.rerun()
                 else:
-                    st.warning("Please enter a valid key.")
-        with col_v2:
-            if st.button("New Session", icon=":material/lock_reset:", use_container_width=True, key="btn_new_vault", help="Reset to a fresh isolated session"):
+                    st.warning("Please enter a valid key name.")
+
+        if current_uid != "default":
+            if st.button("Switch to Default Vault", icon=":material/home:", use_container_width=True, key="btn_default_vault"):
+                st.session_state.user_profile_id = "default"
+                st.session_state.custom_vault_key = ""
+                st.session_state.memory_store = MemoryStore(user_id="default")
+                st.toast("Switched to Default Vault!")
+                st.rerun()
+        else:
+            if st.button("Start Fresh Private Session", icon=":material/lock_reset:", use_container_width=True, key="btn_new_vault", help="Reset to a temporary isolated session"):
                 import uuid
                 new_uid = f"s_{uuid.uuid4().hex[:8]}"
                 st.session_state.user_profile_id = new_uid
