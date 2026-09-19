@@ -1432,12 +1432,13 @@ with st.sidebar:
 
     # A. Add Custom Memory Fact
     with st.expander("Add Custom Fact", expanded=False):
-        new_fact_val = st.text_input("Fact to remember", placeholder="e.g. Loves building AI agents", label_visibility="collapsed", key="input_custom_fact")
-        if st.button("Save to Vault", use_container_width=True, key="btn_save_custom_fact"):
-            if new_fact_val.strip():
-                st.session_state.memory_store.save_memory(new_fact_val.strip())
-                st.toast("Fact saved to vector memory!")
-                st.rerun()
+        with st.form(key="add_fact_form", clear_on_submit=True, border=False):
+            new_fact_val = st.text_input("Fact to remember", placeholder="e.g. Loves building AI agents", label_visibility="collapsed")
+            if st.form_submit_button("Save to Vault", use_container_width=True):
+                if new_fact_val and new_fact_val.strip():
+                    st.session_state.memory_store.save_memory(new_fact_val.strip())
+                    st.toast("Fact saved to vector memory!")
+                    st.rerun()
 
     # B. View and Delete Individual Memories
     if mem_count > 0:
