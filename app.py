@@ -1712,20 +1712,34 @@ if query:
         if past_context:
             system_prompt += f"\n\nRelevant memories from past interactions:\n<memories>\n{past_context}\n</memories>\n\nUse these to personalize your response."
 
-        llm = ChatGoogleGenerativeAI(model="models/gemini-3.6-flash", temperature=0.7, max_retries=2)
         messages = [SystemMessage(content=system_prompt)] + active_chat["messages"]
 
-        # 3. Stream response
+        # 3. Stream response with multi-model resilience (auto-fallback if primary is 503/429)
+        candidate_models = ["models/gemini-3.6-flash", "models/gemini-flash-latest"]
         response_placeholder = st.empty()
         full_response = ""
+        last_exception = None
+        stream_success = False
 
-        try:
-            for chunk in llm.stream(messages):
-                piece = extract_text_content(chunk.content)
-                if piece:
-                    full_response += piece
-                    response_placeholder.markdown(full_response + "▌")
+        for model_name in candidate_models:
+            try:
+                llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7, max_retries=2)
+                full_response = ""
+                for chunk in llm.stream(messages):
+                    piece = extract_text_content(chunk.content)
+                    if piece:
+                        full_response += piece
+                        response_placeholder.markdown(full_response + "▌")
 
+                if full_response.strip():
+                    stream_success = True
+                    break
+            except Exception as e:
+                last_exception = e
+                full_response = ""
+                continue
+
+        if stream_success:
             response_placeholder.markdown(full_response)
             latency = time.time() - start_time
             active_chat["messages"].append(AIMessage(content=full_response, additional_kwargs={"recalled": past_context, "latency": latency}))
@@ -1750,19 +1764,22 @@ if query:
             """, unsafe_allow_html=True)
             st.rerun()
 
-        except Exception as e:
-            error_msg = str(e)
-            is_rate_limit = "429" in error_msg or "ResourceExhausted" in error_msg
-            if is_rate_limit:
-                clean_err = "**Rate Limit Exceeded:** Gemini API request limit reached. Please wait a few seconds and click **Retry** below."
+        else:
+            # Handle failure with clean human-readable text (no raw JSON)
+            err_str = str(last_exception) if last_exception else "Unknown error"
+            err_lower = err_str.lower()
+            if "503" in err_str or "unavailable" in err_lower or "high demand" in err_lower:
+                clean_err = "**Server High Demand (503):** Google's AI servers are experiencing temporary peak traffic. Please click **Retry** below to generate your response."
+            elif "429" in err_str or "resourceexhausted" in err_lower or "quota" in err_lower:
+                clean_err = "**Rate Limit Exceeded (429):** Free tier request limit reached. Please wait a few moments and click **Retry** below."
             else:
-                clean_err = f"**Error:** {error_msg}"
+                clean_err = "**Service Temporarily Busy:** The AI service could not complete your request. Please click **Retry** below."
 
             error_ai_msg = AIMessage(
                 content=clean_err,
                 additional_kwargs={
                     "is_error": True,
-                    "error_type": "rate_limit" if is_rate_limit else "general",
+                    "error_type": "busy" if "503" in err_str else ("rate_limit" if "429" in err_str else "general"),
                     "failed_query": query
                 }
             )
