@@ -16,177 +16,160 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ── CSS Design System (Midnight Glassmorphism) ──
+# ── CSS Design System (Linear.app Style) ──
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
     :root {
-        --bg: #09090b;
-        --card: rgba(24, 24, 27, 0.6);
-        --card-hover: rgba(39, 39, 42, 0.8);
-        --text: #ffffff;
-        --text2: #a1a1aa;
-        --text3: #52525b;
-        --border: rgba(255, 255, 255, 0.08);
-        --border-glow: rgba(139, 92, 246, 0.3);
-        --accent: #8b5cf6;
-        --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-        --success: #10b981;
-        --success-bg: rgba(16, 185, 129, 0.1);
-        --success-border: rgba(16, 185, 129, 0.2);
-        --radius: 16px;
-        --radius-lg: 24px;
-        --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+        --canvas: #010102;
+        --surface-1: #0f1011;
+        --surface-2: #141516;
+        --surface-3: #18191a;
+        --hairline: #23252a;
+        --primary: #5e6ad2;
+        --primary-hover: #828fff;
+        --ink: #f7f8f8;
+        --ink-muted: #d0d6e0;
+        --ink-subtle: #8a8f98;
+        --radius: 8px;
+        --radius-lg: 12px;
+        --shadow-linear: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
     * {
-        font-family: 'Outfit', sans-serif !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        letter-spacing: -0.2px;
     }
 
     html, body, .stApp, [data-testid="stAppViewContainer"] {
-        background-color: var(--bg) !important;
-        color: var(--text) !important;
+        background-color: var(--canvas) !important;
+        color: var(--ink) !important;
         overflow-x: hidden !important;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
-        background-attachment: fixed;
     }
     
     [data-testid="stMainBlockContainer"] {
-        padding: 1rem 1rem 3rem 1rem !important;
-        max-width: 860px !important;
+        padding: 2rem 1rem 3rem 1rem !important;
+        max-width: 800px !important;
         margin: 0 auto !important;
     }
 
     #MainMenu, [data-testid="stHeader"], [data-testid="stFooter"] { 
         display: none !important; 
     }
-
-    /* Hide default Streamlit header anchor links */
     a.header-anchor, [data-testid="stMarkdownContainer"] h1 a, [data-testid="stMarkdownContainer"] h2 a { display: none !important; }
 
     /* Chat Messages */
     .stChatMessage[data-testid="stChatMessage"] {
         border-radius: var(--radius) !important;
-        padding: 20px 24px !important;
-        margin-bottom: 16px !important;
-        font-size: 14.5px;
-        line-height: 1.7;
+        padding: 16px 20px !important;
+        margin-bottom: 12px !important;
+        font-size: 14px;
+        line-height: 1.6;
         border: 1px solid transparent !important;
-        backdrop-filter: blur(10px);
     }
 
-    /* User Message (Inset/Flat) */
+    /* User Message (Inset) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
-        background: rgba(255, 255, 255, 0.03) !important;
-        border-color: rgba(255, 255, 255, 0.05) !important;
+        background: transparent !important;
+        border-color: var(--hairline) !important;
     }
 
-    /* AI Message (Glowing Card) */
+    /* AI Message (Surface-1) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
-        background: var(--card) !important;
-        border-color: var(--border) !important;
-        box-shadow: 0 4px 24px -1px rgba(0,0,0,0.2) !important;
+        background: var(--surface-1) !important;
+        border-color: var(--hairline) !important;
+        box-shadow: var(--shadow-linear) !important;
     }
 
     /* Chat Input submit button & icons */
     [data-testid="stChatInputSubmitButton"] {
-        color: var(--accent) !important;
+        color: var(--primary) !important;
     }
-    
     [data-testid="stChatInputSubmitButton"] svg {
-        fill: var(--accent) !important;
-        color: var(--accent) !important;
+        fill: var(--primary) !important;
+        color: var(--primary) !important;
     }
 
-    /* Chat Input */
+    /* Chat Input Container */
     .stChatInput > div {
-        border-radius: 20px !important;
-        border: 1px solid var(--border) !important;
-        background: rgba(9, 9, 11, 0.8) !important;
-        backdrop-filter: blur(12px) !important;
-        transition: all 0.3s ease;
-        padding: 6px 10px !important;
+        border-radius: var(--radius-lg) !important;
+        border: 1px solid var(--hairline) !important;
+        background: var(--surface-1) !important;
+        transition: all 0.2s ease;
+        padding: 4px 8px !important;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.6) !important;
     }
 
     .stChatInput > div:focus-within {
-        border-color: var(--border-glow) !important;
-        box-shadow: var(--shadow-glow) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 1px var(--primary) !important;
     }
 
     .stChatInput textarea {
-        color: var(--text) !important;
+        color: var(--ink) !important;
         font-size: 14px !important;
     }
-
     .stChatInput textarea::placeholder {
-        color: var(--text3) !important;
+        color: var(--ink-subtle) !important;
     }
 
     /* Buttons */
     .stButton > button,
     [data-testid="stDownloadButton"] > button {
-        border-radius: 50px !important;
-        padding: 8px 20px !important;
+        border-radius: var(--radius) !important;
+        padding: 6px 14px !important;
         font-weight: 500 !important;
-        font-size: 13.5px !important;
-        transition: all 0.3s ease;
+        font-size: 13px !important;
+        transition: all 0.2s ease;
         cursor: pointer;
-        background: rgba(255, 255, 255, 0.03) !important;
-        color: var(--text2) !important;
-        border: 1px solid var(--border) !important;
-        backdrop-filter: blur(8px);
+        background: var(--surface-2) !important;
+        color: var(--ink) !important;
+        border: 1px solid var(--hairline) !important;
     }
 
     .stButton > button:hover,
     [data-testid="stDownloadButton"] > button:hover {
-        border-color: var(--accent) !important;
+        background: var(--surface-3) !important;
+        border-color: var(--ink-subtle) !important;
         color: #ffffff !important;
-        background: rgba(139, 92, 246, 0.1) !important;
-        box-shadow: var(--shadow-glow) !important;
-        transform: translateY(-1px);
     }
 
     /* Hero Section */
     .hero {
         text-align: center;
-        padding: 60px 24px 48px 24px;
-        max-width: 680px;
+        padding: 40px 24px;
+        max-width: 640px;
         margin: 0 auto;
     }
 
     .hero-kicker {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        color: #ffffff;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+        color: var(--primary);
         margin: 0 0 16px 0 !important;
-        background: var(--accent-gradient);
         display: inline-block;
-        padding: 6px 16px;
-        border-radius: 50px;
-        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+        padding: 4px 12px;
+        background: var(--surface-1);
+        border: 1px solid var(--hairline);
+        border-radius: 9999px;
     }
 
     .hero-title {
-        font-size: clamp(32px, 6vw, 48px);
-        font-weight: 800;
+        font-size: clamp(32px, 5vw, 48px);
+        font-weight: 600;
         line-height: 1.1;
-        margin: 0 0 20px 0;
+        margin: 0 0 16px 0;
         letter-spacing: -1.5px;
-        background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--ink);
     }
 
     .hero-desc {
         font-size: 16px;
         font-weight: 400;
-        line-height: 1.7;
-        color: var(--text2);
+        line-height: 1.5;
+        color: var(--ink-muted);
         margin: 0;
     }
 
@@ -194,62 +177,58 @@ st.markdown("""
     .features {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 16px;
         max-width: 760px;
         margin: 32px auto 0 auto;
-        padding: 0 24px;
+        padding: 0 16px;
     }
 
     .feat {
-        background: var(--card);
-        border: 1px solid var(--border);
+        background: var(--surface-1);
+        border: 1px solid var(--hairline);
         border-radius: var(--radius-lg);
-        padding: 32px 20px;
-        text-align: center;
-        backdrop-filter: blur(12px);
-        transition: all 0.3s ease;
+        padding: 24px;
+        text-align: left;
+        transition: all 0.2s ease;
     }
 
     .feat:hover {
-        transform: translateY(-5px);
-        background: var(--card-hover);
-        border-color: var(--border-glow);
-        box-shadow: var(--shadow-glow);
+        background: var(--surface-2);
+        border-color: var(--ink-subtle);
     }
 
     .feat-icon {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        width: 52px;
-        height: 52px;
-        margin-bottom: 20px;
-        color: #ffffff;
-        font-size: 1.2rem;
+        background: var(--surface-3);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius);
+        width: 32px;
+        height: 32px;
+        margin-bottom: 16px;
+        color: var(--ink-muted);
+        font-size: 14px;
     }
     
     .feat:hover .feat-icon {
-        background: var(--accent-gradient);
-        border-color: transparent;
-        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+        color: var(--primary);
+        border-color: var(--primary);
+        background: rgba(94, 106, 210, 0.1);
     }
 
     .feat-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #ffffff;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--ink);
         margin: 0 0 8px 0;
-        letter-spacing: -0.2px;
     }
 
     .feat-desc {
-        font-size: 13.5px;
+        font-size: 14px;
         font-weight: 400;
-        color: var(--text2);
-        line-height: 1.6;
+        color: var(--ink-muted);
+        line-height: 1.5;
         margin: 0;
     }
 
@@ -257,48 +236,37 @@ st.markdown("""
     .ft {
         text-align: center;
         padding: 60px 0 32px 0;
-        font-size: 13px;
-        color: var(--text3);
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
+        font-size: 12px;
+        color: var(--ink-subtle);
     }
 
     .ft-links {
         display: flex;
         justify-content: center;
         gap: 24px;
-        margin-top: 8px;
+        margin-top: 12px;
     }
 
     .ft a {
-        color: var(--text3);
+        color: var(--ink-subtle);
         text-decoration: none;
-        transition: all 0.2s ease;
-        padding: 8px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid transparent;
+        transition: color 0.2s ease;
     }
 
     .ft a:hover { 
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.08);
-        border-color: var(--border);
-        transform: translateY(-2px);
+        color: var(--ink);
     }
 
     /* Memory Badge */
     .mem-toast {
         font-size: 12px;
-        color: var(--success);
-        background: var(--success-bg);
-        padding: 8px 16px;
-        border-radius: 12px;
-        border: 1px solid var(--success-border);
+        color: var(--ink-muted);
+        background: var(--surface-2);
+        padding: 6px 12px;
+        border-radius: var(--radius);
+        border: 1px solid var(--hairline);
         margin-top: 12px;
         display: inline-block;
-        backdrop-filter: blur(8px);
     }
 </style>
 """, unsafe_allow_html=True)
