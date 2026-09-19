@@ -303,11 +303,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── JS to remove '· Streamlit' suffix from title ──
+# ── JS & GSAP Animations ──
 import streamlit.components.v1 as components
 components.html(
     """
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
+        // 1. Rename Streamlit Title
         const target = window.parent.document.querySelector('title');
         if(target) {
             target.innerText = "Custom AI Agent";
@@ -318,6 +320,64 @@ components.html(
             });
             observer.observe(target, { childList: true, characterData: true, subtree: true });
         }
+
+        // 2. GSAP Stunning Entry Animations
+        // We use setTimeout to ensure Streamlit's React DOM has fully rendered the elements
+        setTimeout(() => {
+            const parent = window.parent.document;
+            
+            // Prevent re-animating if already animated (st.rerun triggers this script again)
+            if (parent.body.dataset.animated === "true") return;
+            parent.body.dataset.animated = "true";
+            
+            // Animate Hero Section
+            gsap.from(parent.querySelectorAll('.hero-kicker, .hero-title, .hero-desc'), {
+                y: 40,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.15,
+                ease: "power4.out"
+            });
+
+            // Animate Feature Cards (Pop in with back ease)
+            gsap.from(parent.querySelectorAll('.feat'), {
+                y: 50,
+                opacity: 0,
+                scale: 0.95,
+                duration: 1.2,
+                stagger: 0.15,
+                ease: "back.out(1.2)",
+                delay: 0.3
+            });
+
+            // Animate Quick Prompt Buttons
+            gsap.from(parent.querySelectorAll('.stButton button'), {
+                y: 20,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out",
+                delay: 0.6
+            });
+            
+            // Animate Chat Input Bar
+            gsap.from(parent.querySelectorAll('.stChatInput'), {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                delay: 0.8
+            });
+            
+            // Animate Footer
+            gsap.from(parent.querySelectorAll('.ft'), {
+                opacity: 0,
+                duration: 1.5,
+                ease: "power2.out",
+                delay: 1
+            });
+            
+        }, 500); 
     </script>
     """,
     height=0,
