@@ -211,7 +211,7 @@ st.markdown("""
     }
     
     [data-testid="stMainBlockContainer"] {
-        padding: 1.5rem 1.5rem 75px 1.5rem !important;
+        padding: 1.5rem 1.5rem 88px 1.5rem !important;
         max-width: 860px !important;
         margin: 0 auto !important;
     }
@@ -365,7 +365,7 @@ st.markdown("""
         background-color: transparent !important;
     }
     [data-testid="stBottom"] {
-        padding: 0 0 12px 0 !important;
+        padding: 0 0 28px 0 !important;
         pointer-events: auto !important;
     }
     [data-testid="stBottomBlockContainer"] {
