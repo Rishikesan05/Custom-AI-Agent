@@ -675,6 +675,11 @@ st.markdown("""
         color: var(--ink) !important;
     }
 
+    /* Completely hide Streamlit floating form input instructions to eliminate text overlap */
+    [data-testid="InputInstructions"] {
+        display: none !important;
+    }
+
     /* Suggestion Grid */
     .suggestion-grid .stButton > button {
         border-radius: var(--radius) !important;
@@ -1432,7 +1437,7 @@ with st.sidebar:
 
     # A. Add Custom Memory Fact
     with st.expander("Add Custom Fact", expanded=False):
-        with st.form(key="add_fact_form", clear_on_submit=True, border=False):
+        with st.form(key="add_fact_form", clear_on_submit=True, border=False, enter_to_submit=False):
             new_fact_val = st.text_input("Fact to remember", placeholder="e.g. Loves building AI agents", label_visibility="collapsed")
             if st.form_submit_button("Save to Vault", use_container_width=True):
                 if new_fact_val and new_fact_val.strip():
