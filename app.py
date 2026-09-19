@@ -632,7 +632,29 @@ st.markdown("""
         line-height: 1.65 !important;
     }
 
-
+    /* Clean Chat Message Action Buttons (Retry, etc.) */
+    .stChatMessage .stButton button {
+        border-radius: var(--radius-pill) !important;
+        font-size: 12.5px !important;
+        font-weight: 600 !important;
+        padding: 4px 14px !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        border: 1px solid var(--hairline) !important;
+        background: var(--surface-1) !important;
+        color: var(--ink) !important;
+        box-shadow: var(--shadow-subtle) !important;
+        transition: all 0.15s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-top: 6px !important;
+    }
+    .stChatMessage .stButton button:hover {
+        background: var(--surface-3) !important;
+        border-color: var(--ink-subtle) !important;
+        transform: translateY(-1px) !important;
+    }
 
     /* Suggestion Grid */
     .suggestion-grid .stButton > button {
@@ -1448,7 +1470,7 @@ with st.sidebar:
     with st.expander("Architecture Specs", expanded=False):
         st.markdown("""
         <div style="font-size: 11.5px; line-height: 1.7; color: var(--ink-muted);">
-            <div><strong>LLM:</strong> Gemini 3.5 Flash</div>
+            <div><strong>LLM:</strong> Gemini 3.6 Flash</div>
             <div><strong>Vector DB:</strong> FAISS Semantic Index</div>
             <div><strong>Embeddings:</strong> gemini-embedding-2</div>
             <div><strong>Audio:</strong> Google SpeechRecognition</div>
@@ -1521,37 +1543,98 @@ if not st.session_state.messages:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ── Chat Display ──
-for msg in st.session_state.messages:
+for idx, msg in enumerate(st.session_state.messages):
     avatar_icon = "assets/user.svg" if msg.type == "human" else "assets/assistant.svg"
     with st.chat_message(msg.type, avatar=avatar_icon):
         if msg.type == "ai":
-            recalled = getattr(msg, "additional_kwargs", {}).get("recalled", "")
-            if recalled:
-                items = [m.strip("- ").strip() for m in recalled.split("\n") if m.strip()]
-                count = len(items)
-                items_html = "".join(f"<li style='margin-bottom: 3px;'>{item}</li>" for item in items)
-                st.markdown(f"""
-                <details style="margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 6px 12px; font-size: 12px; cursor: pointer;">
-                    <summary style="font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; user-select: none;">
-                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #475569; display: inline-block;"></span>
-                        <span>Recalled {count} relevant facts</span>
-                    </summary>
-                    <ul style="margin: 6px 0 2px 0; padding-left: 18px; color: var(--ink-muted); line-height: 1.45;">
-                        {items_html}
-                    </ul>
-                </details>
-                """, unsafe_allow_html=True)
+            is_error = getattr(msg, "additional_kwargs", {}).get("is_error", False)
+            if is_error:
+                st.error(clean_display_text(msg.content))
+                failed_q = getattr(msg, "additional_kwargs", {}).get("failed_query", "")
+                
+                # Dedicated prominent Retry button
+                col_btn, _ = st.columns([2, 8])
+                with col_btn:
+                    if st.button("🔄 Retry", key=f"retry_err_{idx}", help="Click to retry generating this response"):
+                        active_chat = st.session_state.chats[st.session_state.active_chat_id]
+                        # Remove error AI message and preceding human message if matched
+                        new_msgs = []
+                        for m_idx, m in enumerate(active_chat["messages"]):
+                            if m_idx == idx:
+                                continue
+                            if m_idx == idx - 1 and m.type == "human":
+                                continue
+                            new_msgs.append(m)
+                        active_chat["messages"] = new_msgs
+                        st.session_state.messages = active_chat["messages"]
+                        if failed_q:
+                            st.session_state.quick_query = failed_q
+                        st.rerun()
+            else:
+                recalled = getattr(msg, "additional_kwargs", {}).get("recalled", "")
+                if recalled:
+                    items = [m.strip("- ").strip() for m in recalled.split("\n") if m.strip()]
+                    count = len(items)
+                    items_html = "".join(f"<li style='margin-bottom: 3px;'>{item}</li>" for item in items)
+                    st.markdown(f"""
+                    <details style="margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 6px 12px; font-size: 12px; cursor: pointer;">
+                        <summary style="font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; user-select: none;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #475569; display: inline-block;"></span>
+                            <span>Recalled {count} relevant facts</span>
+                        </summary>
+                        <ul style="margin: 6px 0 2px 0; padding-left: 18px; color: var(--ink-muted); line-height: 1.45;">
+                            {items_html}
+                        </ul>
+                    </details>
+                    """, unsafe_allow_html=True)
 
-        st.markdown(clean_display_text(msg.content))
+                st.markdown(clean_display_text(msg.content))
 
-        if msg.type == "ai":
-            latency = getattr(msg, "additional_kwargs", {}).get("latency")
-            if latency:
-                st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
-                    <span>{latency:.2f}s</span>
-                </div>
-                """, unsafe_allow_html=True)
+                latency = getattr(msg, "additional_kwargs", {}).get("latency")
+                is_last_ai = (idx == len(st.session_state.messages) - 1)
+
+                if is_last_ai:
+                    col_info, col_retry = st.columns([5, 1])
+                    with col_info:
+                        if latency:
+                            st.markdown(f"""
+                            <div style="display: flex; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
+                                <span>{latency:.2f}s</span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                    with col_retry:
+                        prec_q = ""
+                        if idx > 0 and st.session_state.messages[idx - 1].type == "human":
+                            prec_q = st.session_state.messages[idx - 1].content
+                        if prec_q:
+                            if st.button("🔄 Retry", key="retry_last_resp", help="Regenerate this response"):
+                                active_chat = st.session_state.chats[st.session_state.active_chat_id]
+                                active_chat["messages"] = active_chat["messages"][:-2]
+                                st.session_state.messages = active_chat["messages"]
+                                st.session_state.quick_query = prec_q
+                                st.rerun()
+                elif latency:
+                    st.markdown(f"""
+                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
+                        <span>{latency:.2f}s</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+        else:
+            st.markdown(clean_display_text(msg.content))
+
+# Fallback for trailing unanswered human message (e.g. if previous execution was interrupted)
+if st.session_state.messages and st.session_state.messages[-1].type == "human" and "quick_query" not in st.session_state:
+    unanswered_q = st.session_state.messages[-1].content
+    with st.chat_message("ai", avatar="assets/assistant.svg"):
+        st.error("**Rate Limit Exceeded or Interrupted:** Previous response could not be generated. Please wait a moment and click **Retry** below.")
+        col_r, _ = st.columns([2, 8])
+        with col_r:
+            if st.button("🔄 Retry", key="retry_unanswered_btn", help="Retry sending this message"):
+                active_chat = st.session_state.chats[st.session_state.active_chat_id]
+                active_chat["messages"].pop()
+                st.session_state.messages = active_chat["messages"]
+                st.session_state.quick_query = unanswered_q
+                st.rerun()
 
 # ── Chat Input ──
 user_query = st.chat_input("Message the agent...")
@@ -1609,7 +1692,7 @@ if query:
         if past_context:
             system_prompt += f"\n\nRelevant memories from past interactions:\n<memories>\n{past_context}\n</memories>\n\nUse these to personalize your response."
 
-        llm = ChatGoogleGenerativeAI(model="models/gemini-3.5-flash", temperature=0.7)
+        llm = ChatGoogleGenerativeAI(model="models/gemini-3.6-flash", temperature=0.7, max_retries=2)
         messages = [SystemMessage(content=system_prompt)] + active_chat["messages"]
 
         # 3. Stream response
@@ -1629,13 +1712,16 @@ if query:
             st.session_state.messages = active_chat["messages"]
 
             # 4. Auto-extract and save new memory
-            extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
-            fact_content = llm.invoke(extract_prompt).content
-            fact = extract_text_content(fact_content).strip()
+            try:
+                extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
+                fact_content = llm.invoke(extract_prompt).content
+                fact = extract_text_content(fact_content).strip()
 
-            if fact and "NONE" not in fact.upper():
-                st.session_state.memory_store.save_memory(fact)
-                st.markdown(f"<div class='mem-toast'>Learned: {fact}</div>", unsafe_allow_html=True)
+                if fact and "NONE" not in fact.upper():
+                    st.session_state.memory_store.save_memory(fact)
+                    st.markdown(f"<div class='mem-toast'>Learned: {fact}</div>", unsafe_allow_html=True)
+            except Exception:
+                pass
 
             st.markdown(f"""
             <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
@@ -1646,9 +1732,22 @@ if query:
 
         except Exception as e:
             error_msg = str(e)
-            if "429" in error_msg or "ResourceExhausted" in error_msg:
-                st.error("**Rate Limit Exceeded:** Please wait 30 seconds and try again.")
+            is_rate_limit = "429" in error_msg or "ResourceExhausted" in error_msg
+            if is_rate_limit:
+                clean_err = "**Rate Limit Exceeded:** Gemini API request limit reached. Please wait a few seconds and click **Retry** below."
             else:
-                st.error(f"**Error:** {error_msg}")
+                clean_err = f"**Error:** {error_msg}"
+
+            error_ai_msg = AIMessage(
+                content=clean_err,
+                additional_kwargs={
+                    "is_error": True,
+                    "error_type": "rate_limit" if is_rate_limit else "general",
+                    "failed_query": query
+                }
+            )
+            active_chat["messages"].append(error_ai_msg)
+            st.session_state.messages = active_chat["messages"]
+            st.rerun()
 
 
