@@ -43,6 +43,11 @@ st.markdown("""
         letter-spacing: -0.2px;
     }
 
+    /* Fix Streamlit Material Icons */
+    .material-symbols-rounded, .material-icons, [class*="icon"] {
+        font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+    }
+
     html, body, .stApp, [data-testid="stAppViewContainer"] {
         background-color: var(--canvas) !important;
         color: var(--ink) !important;
@@ -55,7 +60,8 @@ st.markdown("""
         margin: 0 auto !important;
     }
 
-    #MainMenu, [data-testid="stFooter"] { 
+    /* Hide Deploy Button & Default Menus */
+    [data-testid="stDeployButton"], #MainMenu, [data-testid="stFooter"] { 
         display: none !important; 
     }
     
@@ -64,6 +70,12 @@ st.markdown("""
         background: transparent !important;
     }
     a.header-anchor, [data-testid="stMarkdownContainer"] h1 a, [data-testid="stMarkdownContainer"] h2 a { display: none !important; }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: var(--surface-2) !important;
+        border-right: 1px solid var(--hairline) !important;
+    }
 
     /* Chat Messages */
     .stChatMessage[data-testid="stChatMessage"] {
@@ -337,14 +349,47 @@ with st.sidebar:
     if st.button("🗑️ Clear Memory", use_container_width=True):
         st.session_state.memory_store.clear_memory()
         st.success("Memory Cleared!")
+        
+    st.markdown("<hr style='border-color: var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
+    st.markdown("""<div style='font-size: 12px; color: var(--ink-subtle); margin-bottom: 8px; padding-left: 8px; font-weight: 500;'>Voice Input</div>""", unsafe_allow_html=True)
+    audio_val = st.audio_input("Speak to the agent", label_visibility="collapsed")
+    
+    st.markdown("<hr style='border-color: var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
+    st.markdown("""<div style='font-size: 12px; color: var(--ink-subtle); margin-bottom: 8px; padding-left: 8px; font-weight: 500;'>Actions</div>""", unsafe_allow_html=True)
+    
+    # Export Chat
+    chat_export = ""
+    for m in st.session_state.messages:
+        role = "You" if m.type == "human" else "AI"
+        clean = re.sub(r'[*_#`]', '', m.content)
+        chat_export += f"{role}: {clean}\n\n"
+    st.download_button(
+        label="⤓ Export Chat",
+        data=chat_export if chat_export else "No messages.",
+        file_name="chat_history.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
+    
+    # Footer
+    st.markdown("""
+    <div class="ft" style="margin-top: 40px;">
+        <div class="ft-text">Built by <a href="https://rishiware.com" target="_blank">Rishikesan</a></div>
+        <div class="ft-links" style="display:flex; justify-content:center; gap: 12px; margin-top: 8px;">
+            <a href="https://rishiware.com" target="_blank" title="Website"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></a>
+            <a href="https://linkedin.com/in/rishikesan05" target="_blank" title="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="https://github.com/Rishikesan05" target="_blank" title="GitHub"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── Main Chat Area Header (Empty State) ──
 if not st.session_state.messages:
     # Center container for ChatGPT empty state
     st.markdown("""
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40vh; text-align: center;">
         <div style="background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: var(--shadow-linear);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 7.1"></path><path d="M12 12l9.9 4.9"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         </div>
         <h2 style="font-weight: 600; color: var(--ink); font-size: 32px; margin: 0 0 40px 0;">How can I help you today?</h2>
     </div>
@@ -352,7 +397,7 @@ if not st.session_state.messages:
     
     # Suggested Prompts (ChatGPT style grid)
     # Using Streamlit columns for the grid
-    st.markdown("<div style='max-width: 700px; margin: -20px auto 0 auto;'>", unsafe_allow_html=True)
+    st.markdown("<div style='max-width: 700px; margin: 0 auto 40px auto;'>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✧ What do you remember about me?", use_container_width=True):
@@ -366,8 +411,7 @@ if not st.session_state.messages:
             st.session_state.quick_query = "I want to practice my communication skills."
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ── Voice Input ──
-audio_val = st.audio_input("Speak to the agent", label_visibility="collapsed")
+# ── Voice Input (Logic) ──
 voice_query = None
 if audio_val:
     audio_id = id(audio_val)
@@ -396,6 +440,7 @@ if "quick_query" in st.session_state:
     user_query = st.session_state.quick_query
     del st.session_state.quick_query
 
+# voice_query is fetched from sidebar
 query = voice_query if voice_query else user_query
 
 if query:
@@ -447,45 +492,6 @@ if query:
                 st.error("**Rate Limit Exceeded:** Please wait 30 seconds and try again.")
             else:
                 st.error(f"**Error:** {error_msg}")
-
-    # ── Action Controls ──
-    st.markdown("<br>", unsafe_allow_html=True)
-    ctrl_cols = st.columns([2.5, 2.5, 5])
-
-    with ctrl_cols[0]:
-        chat_export = ""
-        for m in st.session_state.messages:
-            role = "You" if m.type == "human" else "AI"
-            clean = re.sub(r'[*_#`]', '', m.content)
-            chat_export += f"{role}: {clean}\n\n"
-        st.download_button(
-            label="⤓ Export",
-            data=chat_export if chat_export else "No messages.",
-            file_name="chat_history.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
-
-    with ctrl_cols[1]:
-        if st.button("🗑 Clear", use_container_width=True):
-            st.session_state.messages = []
-            st.rerun()
-
-
-# ── Footer ──
-st.markdown("""
-<div class="ft">
-    <div class="ft-text">Built by <a href="https://rishiware.com" target="_blank">Rishikesan</a></div>
-    <div class="ft-links">
-        <a href="https://rishiware.com" target="_blank" title="Website">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </a>
-        <a href="https://linkedin.com/in/rishikesan05" target="_blank" title="LinkedIn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-        </a>
-        <a href="https://github.com/Rishikesan05" target="_blank" title="GitHub">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        </a>
     </div>
 </div>
 """, unsafe_allow_html=True)
