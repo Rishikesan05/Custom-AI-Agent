@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import time
 import re
 import speech_recognition as sr
@@ -9,6 +10,16 @@ from memory import MemoryStore
 import ast
 
 load_dotenv()
+
+# Bridge Streamlit Cloud Secrets into environment variables for LangChain / Gemini
+if hasattr(st, "secrets"):
+    try:
+        if "GEMINI_API_KEY" in st.secrets and not os.environ.get("GEMINI_API_KEY"):
+            os.environ["GEMINI_API_KEY"] = str(st.secrets["GEMINI_API_KEY"])
+        if "GOOGLE_API_KEY" in st.secrets and not os.environ.get("GOOGLE_API_KEY"):
+            os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
+    except Exception:
+        pass
 
 def extract_text_content(content):
     """Extract clean readable text from langchain/gemini chunks or responses."""
