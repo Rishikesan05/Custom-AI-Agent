@@ -16,30 +16,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ── CSS Design System (rishiware.com style) ──
+# ── CSS Design System (Sleek & Premium) ──
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     :root {
-        --bg: #ffffff;
-        --bg2: #f8f8f8;
+        --bg: #f8fafc;
         --card: #ffffff;
-        --text: #1a1a1a;
-        --text2: #555555;
-        --text3: #888888;
-        --border: #e0e0e0;
-        --accent: #1a1a1a;
-        --accent-soft: rgba(0, 0, 0, 0.06);
-        --success: #059669;
+        --text: #0f172a;
+        --text2: #475569;
+        --text3: #94a3b8;
+        --border: #e2e8f0;
+        --accent: #3b82f6;
+        --accent-soft: #eff6ff;
+        --success: #10b981;
         --success-bg: #ecfdf5;
-        --success-border: #d1fae5;
+        --success-border: #a7f3d0;
         --radius: 16px;
         --radius-lg: 24px;
+        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        --shadow-float: 0 20px 40px -10px rgba(0,0,0,0.08);
     }
 
     * {
-        font-family: 'Roboto Mono', monospace !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
     html, body, .stApp, [data-testid="stAppViewContainer"] {
@@ -49,7 +51,7 @@ st.markdown("""
     }
     
     [data-testid="stMainBlockContainer"] {
-        padding: 1rem 1rem 2rem 1rem !important;
+        padding: 1rem 1rem 3rem 1rem !important;
         max-width: 860px !important;
         margin: 0 auto !important;
     }
@@ -58,68 +60,59 @@ st.markdown("""
         display: none !important; 
     }
 
-    /* Hide default Streamlit header anchor links (the 🔗 icon) */
-    a.header-anchor,
-    [data-testid="stMarkdownContainer"] h1 a,
-    [data-testid="stMarkdownContainer"] h2 a,
-    [data-testid="stMarkdownContainer"] h3 a,
-    [data-testid="stMarkdownContainer"] h4 a,
-    [data-testid="stMarkdownContainer"] h5 a,
-    [data-testid="stMarkdownContainer"] h6 a {
-        display: none !important;
-    }
+    /* Hide default Streamlit header anchor links */
+    a.header-anchor, [data-testid="stMarkdownContainer"] h1 a, [data-testid="stMarkdownContainer"] h2 a { display: none !important; }
 
     /* Chat Messages */
     .stChatMessage[data-testid="stChatMessage"] {
         border-radius: var(--radius) !important;
         padding: 20px 24px !important;
-        margin-bottom: 12px !important;
-        font-size: 13px;
+        margin-bottom: 16px !important;
+        font-size: 14px;
         line-height: 1.6;
+        border: none !important;
     }
 
+    /* User Message (Inset/Flat) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
-        background: var(--bg2) !important;
-        border: 0.8px solid var(--border) !important;
+        background: #f1f5f9 !important;
     }
 
+    /* AI Message (Floating Card) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
-        background: var(--bg) !important;
-        border: 0.8px solid var(--border) !important;
+        background: var(--card) !important;
+        box-shadow: var(--shadow-sm) !important;
     }
 
     /* Chat Input submit button & icons */
     [data-testid="stChatInputSubmitButton"] {
-        color: #1a1a1a !important;
+        color: var(--accent) !important;
     }
     
     [data-testid="stChatInputSubmitButton"] svg {
-        fill: #1a1a1a !important;
-        color: #1a1a1a !important;
-    }
-
-    .stChatInput [data-testid="stIconMaterial"],
-    .stChatInput [data-testid="stChatMessageAvatarContainer"] {
-        background-color: #f0f0f0 !important;
-        color: #1a1a1a !important;
+        fill: var(--accent) !important;
+        color: var(--accent) !important;
     }
 
     /* Chat Input */
     .stChatInput > div {
-        border-radius: var(--radius) !important;
-        border: 0.8px solid var(--border) !important;
-        background: var(--bg) !important;
-        transition: border-color 0.2s ease;
+        border-radius: 20px !important;
+        border: 1px solid var(--border) !important;
+        background: var(--card) !important;
+        box-shadow: var(--shadow-md) !important;
+        transition: all 0.3s ease;
+        padding: 4px 8px !important;
     }
 
     .stChatInput > div:focus-within {
         border-color: var(--accent) !important;
-        box-shadow: none !important;
+        box-shadow: var(--shadow-float) !important;
+        transform: translateY(-2px);
     }
 
     .stChatInput textarea {
         color: var(--text) !important;
-        font-size: 13px !important;
+        font-size: 14px !important;
     }
 
     .stChatInput textarea::placeholder {
@@ -130,60 +123,57 @@ st.markdown("""
     .stButton > button,
     [data-testid="stDownloadButton"] > button {
         border-radius: 50px !important;
-        padding: 6px 14px !important;
+        padding: 8px 18px !important;
         font-weight: 500 !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
         transition: all 0.2s ease;
         cursor: pointer;
-        min-height: 0 !important;
-        line-height: 1.4 !important;
-        white-space: nowrap !important;
-    }
-
-    .stButton > button[data-testid="baseButton-secondary"],
-    [data-testid="stDownloadButton"] > button {
-        background-color: var(--bg) !important;
-        color: var(--text) !important;
+        background-color: var(--card) !important;
+        color: var(--text2) !important;
         border: 1px solid var(--border) !important;
+        box-shadow: var(--shadow-sm) !important;
     }
 
-    .stButton > button[data-testid="baseButton-secondary"]:hover,
+    .stButton > button:hover,
     [data-testid="stDownloadButton"] > button:hover {
-        border-color: var(--text) !important;
-        background-color: var(--bg2) !important;
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md) !important;
     }
 
     /* Hero Section */
     .hero {
         text-align: center;
-        padding: 32px 24px 48px 24px;
+        padding: 40px 24px 48px 24px;
         max-width: 640px;
         margin: 0 auto;
     }
 
     .hero-kicker {
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: var(--text2);
+        color: var(--accent);
         margin: 0 0 16px 0 !important;
+        background: var(--accent-soft);
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 50px;
     }
 
     .hero-title {
-        font-size: clamp(16px, 10vw, 36px);
-        font-weight: 700;
-        line-height: 1.3;
+        font-size: clamp(24px, 5vw, 42px);
+        font-weight: 800;
+        line-height: 1.2;
         color: var(--text);
         margin: 0 0 20px 0;
-        letter-spacing: -0.5px;
-        word-break: keep-all !important;
-        overflow-wrap: normal !important;
-        white-space: pre-wrap !important;
+        letter-spacing: -1px;
     }
 
     .hero-desc {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 400;
         line-height: 1.7;
         color: var(--text2);
@@ -194,18 +184,25 @@ st.markdown("""
     .features {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        max-width: 720px;
-        margin: 24px auto 0 auto;
+        gap: 20px;
+        max-width: 760px;
+        margin: 32px auto 0 auto;
         padding: 0 24px;
     }
 
     .feat {
         background: var(--card);
-        border: 0.8px solid var(--border);
-        border-radius: var(--radius);
-        padding: 24px 20px;
+        border: 1px solid rgba(255,255,255,0.5);
+        border-radius: var(--radius-lg);
+        padding: 28px 20px;
         text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feat:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-float);
     }
 
     .feat-icon {
@@ -213,21 +210,22 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         background: var(--accent-soft);
-        border-radius: 50px;
-        padding: 10px;
-        margin-bottom: 14px;
-        color: var(--text);
+        border-radius: 14px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        color: var(--accent);
     }
 
     .feat-title {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
         color: var(--text);
-        margin: 0 0 6px 0;
+        margin: 0 0 8px 0;
     }
 
     .feat-desc {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 400;
         color: var(--text2);
         line-height: 1.6;
@@ -237,63 +235,42 @@ st.markdown("""
     /* Footer */
     .ft {
         text-align: center;
-        padding: 48px 0 24px 0;
-        font-size: 12px;
+        padding: 60px 0 24px 0;
+        font-size: 13px;
         color: var(--text3);
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
     }
 
     .ft-links {
         display: flex;
         justify-content: center;
-        gap: 20px;
-        margin-top: 10px;
+        gap: 24px;
+        margin-top: 8px;
     }
 
     .ft a {
         color: var(--text3);
         text-decoration: none;
         transition: color 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .ft a:hover { 
         color: var(--text);
     }
-    
-    .ft svg {
-        width: 18px;
-        height: 18px;
-    }
 
     /* Memory Badge */
-    .mem-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--success-bg);
-        color: var(--success);
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        border: 1px solid var(--success-border);
-        margin-top: 18px;
-    }
-
     .mem-toast {
-        font-size: 0.75rem;
+        font-size: 12px;
         color: var(--success);
         background: var(--success-bg);
-        padding: 6px 14px;
-        border-radius: 8px;
+        padding: 8px 16px;
+        border-radius: 12px;
         border: 1px solid var(--success-border);
-        margin-top: 8px;
+        margin-top: 12px;
         display: inline-block;
+        box-shadow: var(--shadow-sm);
     }
 </style>
 """, unsafe_allow_html=True)
