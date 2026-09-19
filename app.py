@@ -48,6 +48,41 @@ def clean_display_text(text):
             return "".join(parts)
     return text
 
+def is_api_error_text(text):
+    """Detect whether a message contains raw API error text or rate limit dumps."""
+    if not isinstance(text, str):
+        return False
+    t = text.lower()
+    return (
+        "503 unavailable" in t
+        or "429 resource_exhausted" in t
+        or ("429" in t and "quota" in t)
+        or "{'error':" in t
+        or '{"error":' in t
+        or "rate limit exceeded" in t
+        or "spikes in demand" in t
+        or "temporarily high demand" in t
+    )
+
+def format_clean_error(err_text):
+    """Convert technical API 503/429 errors into a calm, professional notice."""
+    err_str = str(err_text)
+    lower = err_str.lower()
+    if "503" in err_str or "high demand" in lower or "unavailable" in lower or "spikes in demand" in lower:
+        return (
+            "**High Traffic Notice (503):** Google's AI servers are currently experiencing temporary peak demand. "
+            "Traffic spikes typically resolve quickly—please wait about 30 seconds and click **Retry** below."
+        )
+    if "429" in err_str or "resource_exhausted" in lower or "quota" in lower:
+        return (
+            "**Request Limit Notice (429):** The free-tier API request capacity was temporarily reached. "
+            "Please wait about 30 seconds for the quota window to clear, then click **Retry** below."
+        )
+    return (
+        "**Service Temporarily Busy:** Unable to complete response right now. "
+        "Please wait about 30 seconds and click **Retry** below."
+    )
+
 
 st.set_page_config(
     page_title="Custom AI Agent",
@@ -1628,10 +1663,12 @@ for idx, msg in enumerate(st.session_state.messages):
     avatar_icon = "assets/user.svg" if msg.type == "human" else "assets/assistant.svg"
     with st.chat_message(msg.type, avatar=avatar_icon):
         if msg.type == "ai":
-            is_error = getattr(msg, "additional_kwargs", {}).get("is_error", False)
-            if is_error:
-                st.error(clean_display_text(msg.content))
+            is_err_msg = getattr(msg, "additional_kwargs", {}).get("is_error", False) or is_api_error_text(str(msg.content))
+            if is_err_msg:
+                st.error(format_clean_error(msg.content))
                 failed_q = getattr(msg, "additional_kwargs", {}).get("failed_query", "")
+                if not failed_q and idx > 0 and st.session_state.messages[idx - 1].type == "human":
+                    failed_q = st.session_state.messages[idx - 1].content
                 
                 # Dedicated prominent Retry button
                 col_btn, _ = st.columns([2, 8])
@@ -1707,7 +1744,7 @@ for idx, msg in enumerate(st.session_state.messages):
 if st.session_state.messages and st.session_state.messages[-1].type == "human" and "quick_query" not in st.session_state:
     unanswered_q = st.session_state.messages[-1].content
     with st.chat_message("ai", avatar="assets/assistant.svg"):
-        st.error("**Rate Limit Exceeded or Interrupted:** Previous response could not be generated. Please wait a moment and click **Retry** below.")
+        st.error("**Service Temporarily Paused:** Response was interrupted or delayed due to high server traffic. Please wait about 30 seconds and click **Retry** below.")
         col_r, _ = st.columns([2, 8])
         with col_r:
             if st.button("Retry", icon=":material/refresh:", key="retry_unanswered_btn", help="Retry sending this message"):
@@ -1776,7 +1813,12 @@ if query:
         messages = [SystemMessage(content=system_prompt)] + active_chat["messages"]
 
         # 3. Stream response with multi-model resilience (auto-fallback if primary is 503/429)
-        candidate_models = ["models/gemini-3.6-flash", "models/gemini-flash-latest"]
+        candidate_models = [
+            "models/gemini-3.6-flash",
+            "models/gemini-3.5-flash-lite",
+            "models/gemini-flash-latest",
+            "models/gemini-flash-lite-latest",
+        ]
         response_placeholder = st.empty()
         full_response = ""
         last_exception = None
@@ -1784,7 +1826,7 @@ if query:
 
         for model_name in candidate_models:
             try:
-                llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7, max_retries=2)
+                llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7, max_retries=1)
                 full_response = ""
                 for chunk in llm.stream(messages):
                     piece = extract_text_content(chunk.content)
@@ -1806,10 +1848,11 @@ if query:
             active_chat["messages"].append(AIMessage(content=full_response, additional_kwargs={"recalled": past_context, "latency": latency}))
             st.session_state.messages = active_chat["messages"]
 
-            # 4. Auto-extract and save new memory
+            # 4. Auto-extract and save new memory (use fast lite model to preserve quota)
             try:
                 extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
-                fact_content = llm.invoke(extract_prompt).content
+                extract_llm = ChatGoogleGenerativeAI(model="models/gemini-3.5-flash-lite", temperature=0.2, max_retries=0)
+                fact_content = extract_llm.invoke(extract_prompt).content
                 fact = extract_text_content(fact_content).strip()
 
                 if fact and "NONE" not in fact.upper():
@@ -1826,16 +1869,9 @@ if query:
             st.rerun()
 
         else:
-            # Handle failure with clean human-readable text (no raw JSON)
-            err_str = str(last_exception) if last_exception else "Unknown error"
-            err_lower = err_str.lower()
-            if "503" in err_str or "unavailable" in err_lower or "high demand" in err_lower:
-                clean_err = "**Server High Demand (503):** Google's AI servers are experiencing temporary peak traffic. Please click **Retry** below to generate your response."
-            elif "429" in err_str or "resourceexhausted" in err_lower or "quota" in err_lower:
-                clean_err = "**Rate Limit Exceeded (429):** Free tier request limit reached. Please wait a few moments and click **Retry** below."
-            else:
-                clean_err = "**Service Temporarily Busy:** The AI service could not complete your request. Please click **Retry** below."
-
+            # Handle failure with clean, polite, professional notice
+            clean_err = format_clean_error(last_exception)
+            err_str = str(last_exception) if last_exception else ""
             error_ai_msg = AIMessage(
                 content=clean_err,
                 additional_kwargs={
