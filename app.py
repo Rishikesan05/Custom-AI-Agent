@@ -11,9 +11,9 @@ load_dotenv()
 
 st.set_page_config(
     page_title="Custom AI Agent",
-    page_icon="🧠",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ── CSS Design System (Linear.app Style) ──
@@ -361,64 +361,65 @@ if "memory_store" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
+# ── Sidebar (Control Center) ──
+with st.sidebar:
+    st.markdown("""
+    <div style="padding: 12px 0 24px 0;">
+        <div class="hero-kicker" style="margin-bottom: 8px !important;">Agent Status: Online</div>
+        <div class="hero-title" style="font-size: 28px;">Custom AI</div>
+        <p class="hero-desc" style="font-size: 14px;">Powered by Gemini & FAISS Memory</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<hr style='border-color: var(--hairline); margin: 0 0 24px 0;'>", unsafe_allow_html=True)
 
-# ── Hero Section (only when no messages) ──
+    if st.button("✧ What do you remember?", use_container_width=True):
+        st.session_state.quick_query = "What do you remember about me from our past conversations?"
+    
+    if st.button("◷ Recall Memories", use_container_width=True):
+        st.session_state.quick_query = "What memories do you have stored about me? List them all."
+        
+    if st.button("✎ Teach Me", use_container_width=True):
+        st.session_state.quick_query = "Teach me something interesting and useful today."
+    
+    st.markdown("<hr style='border-color: var(--hairline); margin: 24px 0;'>", unsafe_allow_html=True)
+    
+    # Feature Cards in Sidebar
+    st.markdown("""
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="feat" style="padding: 16px;">
+            <span class="feat-icon" style="width: 28px; height: 28px; margin-bottom: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+            <p class="feat-title" style="font-size: 14px;">Chat</p>
+            <p class="feat-desc" style="font-size: 12px;">Gemini LLM powered</p>
+        </div>
+        <div class="feat" style="padding: 16px;">
+            <span class="feat-icon" style="width: 28px; height: 28px; margin-bottom: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
+            <p class="feat-title" style="font-size: 14px;">Memory</p>
+            <p class="feat-desc" style="font-size: 12px;">Persistent FAISS Vector DB</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="margin-top: 24px; font-size: 12px; color: var(--ink-subtle);">
+        🧠 Long-Term Memory Active
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ── Main Chat Area Header ──
 if not st.session_state.messages:
     st.markdown("""
-    <div class="hero">
-        <p class="hero-kicker">Memory Powered</p>
-        <div class="hero-title">Your personal AI<br>that remembers you</div>
-        <p class="hero-desc">
-            Ask anything. This agent learns from your conversations
-            and recalls context from past sessions using vector memory.
-        </p>
-        <div class="mem-badge">🧠 Long-Term Memory Active</div>
+    <div style="height: 40vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px;"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 7.1"></path><path d="M12 12l9.9 4.9"></path></svg>
+        <h2 style="font-weight: 600; color: var(--ink); margin:0;">How can I help you today?</h2>
+        <p style="color: var(--ink-muted); font-size: 15px; margin-top: 8px;">I can remember details across conversations.</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Feature Cards
-    st.markdown("""
-    <div class="features">
-        <div class="feat">
-            <span class="feat-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            </span>
-            <p class="feat-title">Converse</p>
-            <p class="feat-desc">Chat naturally. Powered by Google Gemini for fast, intelligent responses.</p>
-        </div>
-        <div class="feat">
-            <span class="feat-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-            </span>
-            <p class="feat-title">Remember</p>
-            <p class="feat-desc">Learns your preferences and facts. Recalls them in future conversations.</p>
-        </div>
-        <div class="feat">
-            <span class="feat-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-            </span>
-            <p class="feat-title">Voice</p>
-            <p class="feat-desc">Speak to the agent. Built-in speech recognition converts voice to text.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
 
-    # Quick Prompts
-    st.markdown("<br>", unsafe_allow_html=True)
-    cols = st.columns(3)
-    with cols[0]:
-        if st.button("✧ About Me", use_container_width=True):
-            st.session_state.quick_query = "What do you remember about me from our past conversations?"
-    with cols[1]:
-        if st.button("◷ Recall", use_container_width=True):
-            st.session_state.quick_query = "What memories do you have stored about me? List them all."
-    with cols[2]:
-        if st.button("✎ Teach Me", use_container_width=True):
-            st.session_state.quick_query = "Teach me something interesting and useful today."
-
-
-# ── Voice Input ──
-st.markdown("<br>", unsafe_allow_html=True)
+# ── Voice Input (Placed neatly at the top of chat or in sidebar) ──
+# To keep main chat clean, we put audio in a small column if needed, but standard is fine
 audio_val = st.audio_input("Speak to the agent", label_visibility="collapsed")
 voice_query = None
 if audio_val:
