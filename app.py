@@ -1606,11 +1606,11 @@ with st.sidebar:
             st.rerun()
 
     with st.expander("Vault Sync & Privacy", expanded=False):
-        vault_label = "Default (Local)" if current_uid == "default" else current_uid
+        vault_label = "default" if current_uid == "default" else current_uid
         st.markdown(f"""
         <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 8px;">
             <div><strong>Active Vault:</strong> <code style="color: var(--brand-primary);">{vault_label}</code></div>
-            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">URL is 100% clean & private. To access your memories across devices, enter your secret Vault Key.</div>
+            <div style="font-size: 10.5px; color: var(--ink-subtle); margin-top: 4px;">To access your memories across devices, enter your secret Vault Key.</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1634,20 +1634,11 @@ with st.sidebar:
                     st.warning("Please enter a valid key name.")
 
         if current_uid != "default":
-            if st.button("Switch to Default Vault", icon=":material/home:", use_container_width=True, key="btn_default_vault"):
+            if st.button("Disconnect (Use Default Vault)", icon=":material/link_off:", use_container_width=True, key="btn_default_vault"):
                 st.session_state.user_profile_id = "default"
                 st.session_state.custom_vault_key = ""
                 st.session_state.memory_store = MemoryStore(user_id="default")
                 st.toast("Switched to Default Vault!")
-                st.rerun()
-        else:
-            if st.button("Start Fresh Private Session", icon=":material/lock_reset:", use_container_width=True, key="btn_new_vault", help="Reset to a temporary isolated session"):
-                import uuid
-                new_uid = f"s_{uuid.uuid4().hex[:8]}"
-                st.session_state.user_profile_id = new_uid
-                st.session_state.custom_vault_key = ""
-                st.session_state.memory_store = MemoryStore(user_id=new_uid)
-                st.toast("Switched to fresh private session!")
                 st.rerun()
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
