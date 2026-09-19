@@ -234,7 +234,7 @@ st.markdown("""
     /* Sidebar Collapse Button inside Sidebar */
     [data-testid="stSidebarCollapseButton"] {
         position: absolute !important;
-        top: 18px !important;
+        top: 43px !important;
         right: 14px !important;
         z-index: 100 !important;
     }
