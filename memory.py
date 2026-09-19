@@ -34,3 +34,34 @@ class MemoryStore:
             return ""
         
         return "\n".join(f"- {mem}" for mem in valid_docs)
+
+    def get_all_memories(self) -> list[str]:
+        """Return list of all stored memory texts."""
+        try:
+            if hasattr(self.vector_store, "docstore") and hasattr(self.vector_store.docstore, "_dict"):
+                docs = self.vector_store.docstore._dict.values()
+                return [d.page_content for d in docs if d.page_content != "Memory initialized."]
+        except Exception:
+            pass
+        return []
+
+    def delete_memory(self, memory_text: str) -> bool:
+        """Delete an individual memory fact from FAISS."""
+        try:
+            current = self.get_all_memories()
+            remaining = [m for m in current if m.strip() != memory_text.strip()]
+            if remaining:
+                self.vector_store = FAISS.from_texts(["Memory initialized."] + remaining, self.embeddings)
+            else:
+                self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
+            self.vector_store.save_local(self.index_path)
+            return True
+        except Exception as e:
+            print(f"Error deleting memory: {e}")
+            return False
+
+    def clear_memory(self):
+        """Clear all stored memories and reset the index."""
+        self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
+        self.vector_store.save_local(self.index_path)
+

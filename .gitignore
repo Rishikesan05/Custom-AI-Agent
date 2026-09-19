@@ -17,6 +17,12 @@ memory_index/
 .idea/
 .vscode/
 *.swp
+.agents/
+.claude/
+
+# Temp / Build Artifacts
+design_temp/
+gsap_temp/
 
 # OS
 .DS_Store
