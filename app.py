@@ -97,14 +97,14 @@ st.markdown("""
         width: 140px;
         height: 140px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(168, 85, 247, 0.2) 45%, transparent 70%);
+        background: radial-gradient(circle, rgba(148, 163, 184, 0.18) 0%, rgba(203, 213, 225, 0.06) 50%, transparent 70%);
         filter: blur(24px);
         z-index: 0;
         animation: auraFloat 5s ease-in-out infinite alternate;
     }
     @keyframes auraFloat {
-        0% { transform: scale(0.9); opacity: 0.65; }
-        100% { transform: scale(1.22); opacity: 1; }
+        0% { transform: scale(0.9); opacity: 0.6; }
+        100% { transform: scale(1.2); opacity: 0.9; }
     }
     .hero-logo-box {
         position: relative;
@@ -270,62 +270,48 @@ st.markdown("""
     /* Align Streamlit bottom bar */
     [data-testid="stBottom"] {
         background: transparent !important;
-        padding: 0 !important;
-        pointer-events: none !important;
+        padding: 0 0 20px 0 !important;
+        pointer-events: auto !important;
     }
+    [data-testid="stBottom"] > div,
     [data-testid="stBottomBlockContainer"] {
-        padding: 0 !important;
+        max-width: 760px !important;
+        margin: 0 auto !important;
+        padding: 0 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        position: relative !important;
+        box-sizing: border-box !important;
     }
 
-    /* Container for the two side buttons and audio */
-    [data-testid="stHorizontalBlock"]:has(.action-btn-left),
-    [data-testid="stLayoutWrapper"]:has(.action-btn-left),
-    [data-testid="stElementContainer"]:has([data-testid="stAudioInput"]) {
-        position: static !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* ── UNIFIED 3-PART LUXURY BOTTOM DOCK (Desktop) ── */
-    /* Dock width: 46px [+] + 10px + 490px [input] + 10px + 200px [voice] = 756px */
-
-    /* 1. Left '+' Button (New Chat & Conversations Menu) */
-    [data-testid="stColumn"]:has(.action-btn-left) {
-        position: fixed !important;
-        bottom: 22px !important;
-        left: calc(50% - 378px) !important;
-        z-index: 1001 !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* 2. Center Chat Input */
+    /* 1. Chat Input Field */
     .stChatInput {
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     .stChatInput > div {
-        position: fixed !important;
-        bottom: 22px !important;
-        left: calc(50% - 262px) !important;
-        width: 524px !important;
-        max-width: 524px !important;
-        height: 46px !important;
-        min-height: 46px !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: none !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        height: 48px !important;
+        min-height: 48px !important;
         margin: 0 !important;
         border-radius: var(--radius-pill) !important;
         border: 1px solid var(--hairline) !important;
         background: var(--surface-1) !important;
         box-shadow: var(--shadow-floating) !important;
         padding: 4px 10px 4px 18px !important;
-        transition: all 0.25s ease !important;
+        transition: all 0.2s ease !important;
         pointer-events: auto !important;
         display: flex !important;
         align-items: center !important;
-        z-index: 1000 !important;
+        box-sizing: border-box !important;
     }
     .stChatInput > div:focus-within {
         border-color: var(--ink-subtle) !important;
@@ -346,96 +332,163 @@ st.markdown("""
         width: 34px !important;
         min-height: 34px !important;
         min-width: 34px !important;
-        margin: 0 !important;
-    }
-
-    /* Responsive Mobile Layout for Bottom Dock */
-    @media (max-width: 820px) {
-        [data-testid="stColumn"]:has(.action-btn-left) {
-            left: 12px !important;
-            bottom: 16px !important;
-            width: 40px !important;
-            min-width: 40px !important;
-        }
-        [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button {
-            width: 40px !important;
-            height: 40px !important;
-            min-width: 40px !important;
-            min-height: 40px !important;
-        }
-        .stChatInput > div {
-            left: 58px !important;
-            width: calc(100% - 114px) !important;
-            max-width: calc(100% - 114px) !important;
-            bottom: 16px !important;
-            height: 40px !important;
-            min-height: 40px !important;
-        }
-    }
-
-    /* Base styling for circular floating '+' action button */
-    [data-testid="stColumn"]:has(.action-btn-left) {
-        position: fixed !important;
-        bottom: 22px !important;
-        left: calc(50% - 320px) !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
-        height: 46px !important;
-        min-height: 46px !important;
-        z-index: 1000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    @media (min-width: 821px) {
-        [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stColumn"]:has(.action-btn-left) {
-            left: calc(50% + 150px - 320px) !important;
-        }
-        [data-testid="stSidebar"][aria-expanded="true"] ~ * .stChatInput > div {
-            left: calc(50% + 150px - 262px) !important;
-        }
-    }
-    [data-testid="stColumn"]:has(.action-btn-left) {
-        position: fixed !important;
-        bottom: 22px !important;
-        left: calc(50% - 320px) !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
-        height: 46px !important;
-        min-height: 46px !important;
-        z-index: 1000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button {
         border-radius: 50% !important;
-        width: 46px !important;
-        height: 46px !important;
-        min-height: 46px !important;
-        min-width: 46px !important;
-        padding: 0 !important;
-        background: var(--surface-1) !important;
-        box-shadow: var(--shadow-floating) !important;
-        border: 1px solid var(--hairline) !important;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border: none !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        cursor: pointer !important;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        margin: 0 !important;
+        transition: all 0.15s ease !important;
+    }
+    [data-testid="stChatInputSubmitButton"]:hover {
+        background: #1e293b !important;
+        transform: scale(1.05) !important;
     }
 
-    [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button:hover {
-        border-color: var(--ink-subtle) !important;
-        transform: scale(1.05);
-        box-shadow: 0 12px 28px rgba(0,0,0,0.1) !important;
+    /* 2. Unified Horizontal Dock Wrapper */
+    #wa-dock-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 760px !important;
+        margin: 0 auto !important;
+        position: relative !important;
+        box-sizing: border-box !important;
     }
 
-    /* Hide the second icon (chevron expand_more) inside popover button */
-    [data-testid="stColumn"]:has(.action-btn-left) button div[aria-hidden="true"] {
+    #wa-chat-min-btn {
         display: none !important;
+    }
+    #wa-dock-wrapper.recording #wa-chat-min-btn {
+        display: flex !important;
+    }
+
+    /* 3. Dock Circular Action Buttons (Mic & Minimized Chat) */
+    .wa-dock-circle-btn {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        background: var(--surface-1);
+        border: 1px solid var(--hairline);
+        box-shadow: var(--shadow-floating);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--ink);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+    .wa-dock-circle-btn:hover {
+        transform: scale(1.06);
+        border-color: var(--ink-subtle);
+        background: var(--surface-2);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    }
+
+    /* 4. Long Expandable Voice Recording Bar */
+    #wa-record-bar {
+        display: none !important;
+        flex: 1 1 auto;
+        height: 48px;
+        background: var(--surface-1);
+        border: 1px solid var(--hairline);
+        border-radius: var(--radius-pill);
+        box-shadow: var(--shadow-floating);
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px;
+        box-sizing: border-box;
+        animation: waFadeIn 0.2s ease-out;
+    }
+    @keyframes waFadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    #wa-dock-wrapper.recording #wa-record-bar {
+        display: flex !important;
+    }
+
+    #wa-dock-wrapper.recording .stChatInput {
+        display: none !important;
+    }
+
+    #wa-dock-wrapper.recording #wa-mic-btn {
+        display: none !important;
+    }
+
+    /* Grayscale Recording Actions */
+    .wa-action-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 50%;
+        border: 1px solid var(--hairline);
+        background: var(--surface-2);
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-sizing: border-box;
+    }
+    .wa-action-btn:hover {
+        background: var(--surface-3);
+        border-color: var(--ink-subtle);
+        transform: scale(1.06);
+    }
+    .wa-send-btn {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border: none !important;
+    }
+    .wa-send-btn:hover {
+        background: #1e293b !important;
+        transform: scale(1.06) !important;
+    }
+    .wa-timer {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+        min-width: 44px;
+    }
+    .wa-rec-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #e11d48;
+        animation: waPulse 1.2s infinite;
+    }
+    @keyframes waPulse {
+        0% { transform: scale(0.85); opacity: 0.6; }
+        50% { transform: scale(1.3); opacity: 1; }
+        100% { transform: scale(0.85); opacity: 0.6; }
+    }
+    .wa-waveform {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        height: 24px;
+        flex: 1;
+        max-width: 240px;
+        justify-content: center;
+    }
+    .wa-wave-bar {
+        width: 3px;
+        height: 6px;
+        border-radius: 3px;
+        background: #475569;
+        transition: height 0.08s ease;
     }
 
     /* SVG Icon Replacements for Buttons */
@@ -776,368 +829,353 @@ components.html(
             
         }, 500); 
 
-        // 3. WhatsApp-Style Voice Recorder Component
+        // 3. WhatsApp/ChatGPT Style Voice Recorder & Dock Transformation
         (function() {
             const parentDoc = window.parent.document;
-            if (parentDoc.getElementById('wa-voice-container')) return;
+            const parentWin = window.parent;
 
-            const styleEl = parentDoc.createElement('style');
-            styleEl.innerHTML = `
-                #wa-voice-container {
-                    position: fixed;
-                    bottom: 22px;
-                    left: calc(50% + 150px + 274px);
-                    z-index: 10001;
-                    font-family: 'Plus Jakarta Sans', sans-serif;
-                }
-                @media (max-width: 820px) {
-                    #wa-voice-container {
-                        left: auto !important;
-                        right: 12px !important;
-                        bottom: 16px !important;
-                    }
-                }
-                #wa-mic-btn {
-                    width: 46px;
-                    height: 46px;
-                    border-radius: 50%;
-                    background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    color: #0f172a;
-                }
-                #wa-mic-btn:hover {
-                    transform: scale(1.06);
-                    border-color: #94a3b8;
-                    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-                }
-                #wa-record-bar {
-                    display: none;
-                    position: fixed;
-                    bottom: 22px;
-                    left: calc(50% + 150px - 262px);
-                    width: 582px;
-                    height: 46px;
-                    background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 9999px;
-                    box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.12);
-                    z-index: 10002;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 0 12px;
-                    box-sizing: border-box;
-                    animation: waSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-                @media (max-width: 820px) {
-                    #wa-record-bar {
-                        left: 12px !important;
-                        right: 12px !important;
-                        width: calc(100% - 24px) !important;
-                        bottom: 16px !important;
-                    }
-                }
-                @keyframes waSlideUp {
-                    from { opacity: 0; transform: translateY(8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .wa-rec-dot {
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    background: #ef4444;
-                    animation: waPulse 1.2s infinite;
-                }
-                @keyframes waPulse {
-                    0% { transform: scale(0.85); opacity: 0.6; }
-                    50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
-                    100% { transform: scale(0.85); opacity: 0.6; }
-                }
-                .wa-action-btn {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    border: none;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.15s ease;
-                }
-                .wa-trash-btn {
-                    background: #fee2e2;
-                    color: #ef4444;
-                }
-                .wa-trash-btn:hover {
-                    background: #fecaca;
-                    transform: scale(1.08);
-                }
-                .wa-pause-btn {
-                    background: #f1f5f9;
-                    color: #0f172a;
-                }
-                .wa-pause-btn:hover {
-                    background: #e2e8f0;
-                    transform: scale(1.08);
-                }
-                .wa-send-btn {
-                    background: #10b981;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-                }
-                .wa-send-btn:hover {
-                    background: #059669;
-                    transform: scale(1.08);
-                }
-                .wa-timer {
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #ef4444;
-                    font-variant-numeric: tabular-nums;
-                    min-width: 44px;
-                }
-                .wa-waveform {
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                    height: 24px;
-                    flex: 1;
-                    max-width: 220px;
-                    justify-content: center;
-                }
-                .wa-wave-bar {
-                    width: 3px;
-                    height: 6px;
-                    border-radius: 3px;
-                    background: #6366f1;
-                    transition: height 0.08s ease;
-                }
-            `;
-            parentDoc.head.appendChild(styleEl);
+            function mountDockElements() {
+                const chatInput = parentDoc.querySelector('.stChatInput');
+                if (!chatInput) return;
 
-            const container = parentDoc.createElement('div');
-            container.id = 'wa-voice-container';
-            container.innerHTML = `
-                <div id="wa-mic-btn" title="Voice record like WhatsApp">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" x2="12" y1="19" y2="22"/>
-                    </svg>
-                </div>
-                <div id="wa-record-bar">
-                    <button id="wa-btn-trash" class="wa-action-btn wa-trash-btn" title="Delete recording">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                let wrapper = parentDoc.getElementById('wa-dock-wrapper');
+                if (!wrapper) {
+                    wrapper = parentDoc.createElement('div');
+                    wrapper.id = 'wa-dock-wrapper';
+                    chatInput.parentNode.insertBefore(wrapper, chatInput);
+                }
+
+                // 1. Minimized Chat Icon Button (left side when recording)
+                let chatBtn = parentDoc.getElementById('wa-chat-min-btn');
+                if (!chatBtn) {
+                    chatBtn = parentDoc.createElement('button');
+                    chatBtn.id = 'wa-chat-min-btn';
+                    chatBtn.className = 'wa-dock-circle-btn';
+                    chatBtn.title = 'Switch back to keyboard typing';
+                    chatBtn.style.display = 'none';
+                    chatBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
-                    </button>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div class="wa-rec-dot" id="wa-rec-dot"></div>
-                        <div class="wa-timer" id="wa-timer">00:00</div>
-                    </div>
-                    <div class="wa-waveform" id="wa-waveform">
-                        ${Array(16).fill(0).map(() => '<div class="wa-wave-bar"></div>').join('')}
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button id="wa-btn-pause" class="wa-action-btn wa-pause-btn" title="Pause / Continue">
-                            <svg id="wa-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-                                <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
-                            </svg>
-                            <svg id="wa-icon-play" style="display: none; margin-left: 2px;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="6,4 20,12 6,20"/>
-                            </svg>
-                        </button>
-                        <button id="wa-btn-send" class="wa-action-btn wa-send-btn" title="Send voice message">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            `;
-            parentDoc.body.appendChild(container);
+                    `;
+                }
 
+                // 2. Expandable Voice Recording Bar
+                let bar = parentDoc.getElementById('wa-record-bar');
+                if (!bar) {
+                    bar = parentDoc.createElement('div');
+                    bar.id = 'wa-record-bar';
+                    bar.style.display = 'none';
+                    bar.innerHTML = `
+                        <button id="wa-btn-trash" class="wa-action-btn wa-trash-btn" title="Cancel recording">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                            </svg>
+                        </button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="wa-rec-dot" id="wa-rec-dot"></div>
+                            <div class="wa-timer" id="wa-timer">00:00</div>
+                        </div>
+                        <div class="wa-waveform" id="wa-waveform">
+                            ${Array(18).fill(0).map(() => '<div class="wa-wave-bar"></div>').join('')}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button id="wa-btn-pause" class="wa-action-btn wa-pause-btn" title="Pause / Continue">
+                                <svg id="wa-icon-pause" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                                    <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+                                </svg>
+                                <svg id="wa-icon-play" style="display: none; margin-left: 2px;" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="6,4 20,12 6,20"/>
+                                </svg>
+                            </button>
+                            <button id="wa-btn-send" class="wa-action-btn wa-send-btn" title="Send voice message">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // 3. Circular Mic Button (idle state, right side)
+                let micBtn = parentDoc.getElementById('wa-mic-btn');
+                if (!micBtn) {
+                    micBtn = parentDoc.createElement('button');
+                    micBtn.id = 'wa-mic-btn';
+                    micBtn.className = 'wa-dock-circle-btn';
+                    micBtn.title = 'Click to speak';
+                    micBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" x2="12" y1="19" y2="22"/>
+                        </svg>
+                    `;
+                }
+
+                // Append in exact horizontal order: [chatBtn, chatInput, bar, micBtn]
+                if (chatBtn.parentNode !== wrapper) wrapper.appendChild(chatBtn);
+                if (chatInput.parentNode !== wrapper) wrapper.appendChild(chatInput);
+                if (bar.parentNode !== wrapper) wrapper.appendChild(bar);
+                if (micBtn.parentNode !== wrapper) wrapper.appendChild(micBtn);
+            }
+
+            // Mount immediately and monitor DOM changes
+            mountDockElements();
+            setInterval(mountDockElements, 400);
+
+            // Voice Recording State
             let isRecording = false;
             let isPaused = false;
-            let mediaRecorder = null;
-            let audioStream = null;
-            let audioContext = null;
-            let analyser = null;
-            let animFrame = null;
             let timerInterval = null;
             let secondsElapsed = 0;
+            let animFrame = null;
             let recognition = null;
-            let finalTranscript = '';
+            let audioStream = null;
+            let audioCtx = null;
+            let analyser = null;
+            let currentTranscript = '';
 
-            const micBtn = parentDoc.getElementById('wa-mic-btn');
-            const recordBar = parentDoc.getElementById('wa-record-bar');
-            const trashBtn = parentDoc.getElementById('wa-btn-trash');
-            const pauseBtn = parentDoc.getElementById('wa-btn-pause');
-            const sendBtn = parentDoc.getElementById('wa-btn-send');
-            const timerEl = parentDoc.getElementById('wa-timer');
-            const iconPause = parentDoc.getElementById('wa-icon-pause');
-            const iconPlay = parentDoc.getElementById('wa-icon-play');
-            const waveBars = parentDoc.querySelectorAll('.wa-wave-bar');
-            const recDot = parentDoc.getElementById('wa-rec-dot');
-
-            function formatTime(secs) {
-                const m = Math.floor(secs / 60).toString().padStart(2, '0');
-                const s = (secs % 60).toString().padStart(2, '0');
-                return `${m}:${s}`;
+            function formatTime(s) {
+                const m = Math.floor(s / 60).toString().padStart(2, '0');
+                const sec = (s % 60).toString().padStart(2, '0');
+                return `${m}:${sec}`;
             }
 
-            function updateWaveform() {
-                if (!isRecording || isPaused) return;
-                if (analyser) {
-                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    analyser.getByteFrequencyData(dataArray);
-                    waveBars.forEach((bar, idx) => {
-                        const val = dataArray[idx * 2] || 0;
-                        const h = Math.max(4, Math.min(22, (val / 255) * 22 + 4));
-                        bar.style.height = `${h}px`;
-                    });
-                } else {
-                    waveBars.forEach((bar) => {
-                        const h = Math.floor(Math.random() * 16) + 4;
-                        bar.style.height = `${h}px`;
-                    });
+            function revertDockToIdle() {
+                isRecording = false;
+                isPaused = false;
+                clearInterval(timerInterval);
+                cancelAnimationFrame(animFrame);
+
+                if (recognition) {
+                    try { recognition.stop(); } catch(e) {}
+                    recognition = null;
                 }
-                animFrame = requestAnimationFrame(updateWaveform);
+                if (audioStream) {
+                    audioStream.getTracks().forEach(t => t.stop());
+                    audioStream = null;
+                }
+                if (audioCtx && audioCtx.state !== 'closed') {
+                    try { audioCtx.close(); } catch(e) {}
+                    audioCtx = null;
+                }
+                analyser = null;
+
+                const wrapper = parentDoc.getElementById('wa-dock-wrapper');
+                if (wrapper) wrapper.classList.remove('recording');
             }
 
-            async function startRecording() {
-                try {
-                    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const source = audioContext.createMediaStreamSource(audioStream);
-                    analyser = audioContext.createAnalyser();
-                    analyser.fftSize = 64;
-                    source.connect(analyser);
+            function runWaveform() {
+                const waveBars = parentDoc.querySelectorAll('.wa-wave-bar');
+                function step() {
+                    if (!isRecording) return;
+                    if (!isPaused) {
+                        if (analyser) {
+                            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                            analyser.getByteFrequencyData(dataArray);
+                            waveBars.forEach((bar, idx) => {
+                                const val = dataArray[idx * 2] || 0;
+                                const h = Math.max(4, Math.min(24, (val / 255) * 24 + 4));
+                                bar.style.height = `${h}px`;
+                            });
+                        } else {
+                            waveBars.forEach(bar => {
+                                const h = Math.floor(Math.random() * 14) + 4;
+                                bar.style.height = `${h}px`;
+                            });
+                        }
+                    }
+                    animFrame = requestAnimationFrame(step);
+                }
+                cancelAnimationFrame(animFrame);
+                animFrame = requestAnimationFrame(step);
+            }
 
-                    mediaRecorder = new MediaRecorder(audioStream);
-                    mediaRecorder.start();
+            function startRecording() {
+                const wrapper = parentDoc.getElementById('wa-dock-wrapper');
+                if (wrapper) wrapper.classList.add('recording');
 
-                    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-                    if (SpeechRec) {
+                const timerEl = parentDoc.getElementById('wa-timer');
+                const iconPause = parentDoc.getElementById('wa-icon-pause');
+                const iconPlay = parentDoc.getElementById('wa-icon-play');
+                const recDot = parentDoc.getElementById('wa-rec-dot');
+
+                isRecording = true;
+                isPaused = false;
+                secondsElapsed = 0;
+                currentTranscript = '';
+
+                if (timerEl) timerEl.innerText = '00:00';
+                if (iconPause) iconPause.style.display = 'block';
+                if (iconPlay) iconPlay.style.display = 'none';
+                if (recDot) recDot.style.animationPlayState = 'running';
+
+                // 2. Start timer immediately
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    if (!isPaused) {
+                        secondsElapsed++;
+                        if (timerEl) timerEl.innerText = formatTime(secondsElapsed);
+                    }
+                }, 1000);
+
+                // 3. Start live waveform
+                runWaveform();
+
+                // 4. Initialize Web Speech Recognition
+                const SpeechRec = parentWin.SpeechRecognition || parentWin.webkitSpeechRecognition || window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRec) {
+                    try {
                         recognition = new SpeechRec();
                         recognition.continuous = true;
                         recognition.interimResults = true;
-                        recognition.lang = 'en-US';
-                        finalTranscript = '';
-                        recognition.onresult = (event) => {
+                        recognition.lang = parentWin.navigator.language || 'en-US';
+                        recognition.onresult = (evt) => {
                             let text = '';
-                            for (let i = 0; i < event.results.length; i++) {
-                                text += event.results[i][0].transcript + ' ';
+                            for (let i = 0; i < evt.results.length; i++) {
+                                text += evt.results[i][0].transcript + ' ';
                             }
-                            finalTranscript = text.trim();
+                            currentTranscript = text.trim();
+                        };
+                        recognition.onerror = (evt) => {
+                            console.warn("Speech recognition warning:", evt.error);
+                        };
+                        recognition.onend = () => {
+                            if (isRecording && !isPaused) {
+                                try { recognition.start(); } catch(e) {}
+                            }
                         };
                         recognition.start();
+                    } catch(err) {
+                        console.warn("SpeechRec start failed:", err);
                     }
+                }
 
-                    isRecording = true;
-                    isPaused = false;
-                    secondsElapsed = 0;
-                    timerEl.innerText = "00:00";
-                    iconPause.style.display = "block";
-                    iconPlay.style.display = "none";
-                    recDot.style.animationPlayState = "running";
-
-                    recordBar.style.display = "flex";
-                    micBtn.style.display = "none";
-
-                    timerInterval = setInterval(() => {
-                        if (!isPaused) {
-                            secondsElapsed++;
-                            timerEl.innerText = formatTime(secondsElapsed);
+                // 5. Connect media stream for hardware audio analyzer
+                const nav = parentWin.navigator.mediaDevices ? parentWin.navigator : window.navigator;
+                if (nav.mediaDevices && nav.mediaDevices.getUserMedia) {
+                    nav.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                        audioStream = stream;
+                        try {
+                            const AudioCtx = parentWin.AudioContext || parentWin.webkitAudioContext || window.AudioContext || window.webkitAudioContext;
+                            audioCtx = new AudioCtx();
+                            const source = audioCtx.createMediaStreamSource(stream);
+                            analyser = audioCtx.createAnalyser();
+                            analyser.fftSize = 64;
+                            source.connect(analyser);
+                        } catch(e) {
+                            console.warn("AudioContext setup:", e);
                         }
-                    }, 1000);
-
-                    updateWaveform();
-                } catch (err) {
-                    console.error("Mic access denied or error:", err);
-                    alert("Microphone access denied. Please allow microphone permissions in your browser.");
+                    }).catch((err) => {
+                        console.warn("getUserMedia access:", err);
+                    });
                 }
             }
 
-            function stopAndCleanup() {
-                isRecording = false;
-                isPaused = false;
-                if (timerInterval) clearInterval(timerInterval);
-                if (animFrame) cancelAnimationFrame(animFrame);
-                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                    try { mediaRecorder.stop(); } catch(e) {}
-                }
-                if (audioStream) {
-                    audioStream.getTracks().forEach(track => track.stop());
-                }
-                if (audioContext && audioContext.state !== 'closed') {
-                    try { audioContext.close(); } catch(e) {}
-                }
-                if (recognition) {
-                    try { recognition.stop(); } catch(e) {}
-                }
-                recordBar.style.display = "none";
-                micBtn.style.display = "flex";
-            }
-
-            trashBtn.onclick = () => {
-                finalTranscript = '';
-                stopAndCleanup();
-            };
-
-            pauseBtn.onclick = () => {
+            function togglePause() {
                 if (!isRecording) return;
+                const iconPause = parentDoc.getElementById('wa-icon-pause');
+                const iconPlay = parentDoc.getElementById('wa-icon-play');
+                const recDot = parentDoc.getElementById('wa-rec-dot');
+                const waveBars = parentDoc.querySelectorAll('.wa-wave-bar');
+
                 if (!isPaused) {
                     isPaused = true;
-                    if (mediaRecorder && mediaRecorder.state === 'recording') {
-                        mediaRecorder.pause();
-                    }
+                    if (iconPause) iconPause.style.display = 'none';
+                    if (iconPlay) iconPlay.style.display = 'block';
+                    if (recDot) recDot.style.animationPlayState = 'paused';
+                    waveBars.forEach(b => b.style.height = '6px');
                     if (recognition) {
                         try { recognition.stop(); } catch(e) {}
                     }
-                    iconPause.style.display = "none";
-                    iconPlay.style.display = "block";
-                    recDot.style.animationPlayState = "paused";
-                    waveBars.forEach(bar => bar.style.height = '6px');
                 } else {
                     isPaused = false;
-                    if (mediaRecorder && mediaRecorder.state === 'paused') {
-                        mediaRecorder.resume();
-                    }
+                    if (iconPause) iconPause.style.display = 'block';
+                    if (iconPlay) iconPlay.style.display = 'none';
+                    if (recDot) recDot.style.animationPlayState = 'running';
                     if (recognition) {
                         try { recognition.start(); } catch(e) {}
                     }
-                    iconPause.style.display = "block";
-                    iconPlay.style.display = "none";
-                    recDot.style.animationPlayState = "running";
-                    updateWaveform();
+                    runWaveform();
                 }
-            };
+            }
 
-            sendBtn.onclick = () => {
-                const textToSend = finalTranscript.trim();
-                stopAndCleanup();
+            function sendRecording() {
+                const text = currentTranscript.trim();
+                revertDockToIdle();
 
-                if (textToSend) {
+                if (text) {
                     const textarea = parentDoc.querySelector('.stChatInput textarea');
                     const submitBtn = parentDoc.querySelector('[data-testid="stChatInputSubmitButton"]');
                     if (textarea && submitBtn) {
                         const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-                        nativeSetter.call(textarea, textToSend);
+                        nativeSetter.call(textarea, text);
                         textarea.dispatchEvent(new Event('input', { bubbles: true }));
                         setTimeout(() => {
                             submitBtn.click();
                         }, 80);
                     }
                 }
+            }
+
+            // Expose active controller to parent window
+            parentWin.__waDockController = {
+                startRecording,
+                togglePause,
+                sendRecording,
+                revertDockToIdle
             };
 
-            micBtn.onclick = startRecording;
+            // Global delegated event listener on parent document
+            if (!parentDoc.__waVoiceDelegationInstalled) {
+                parentDoc.__waVoiceDelegationInstalled = true;
+                parentDoc.addEventListener('click', (e) => {
+                    const ctrl = parentWin.__waDockController;
+                    if (!ctrl) return;
+
+                    const micTarget = e.target.closest('#wa-mic-btn');
+                    if (micTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ctrl.startRecording();
+                        return;
+                    }
+
+                    const chatMinTarget = e.target.closest('#wa-chat-min-btn');
+                    if (chatMinTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ctrl.revertDockToIdle();
+                        return;
+                    }
+
+                    const trashTarget = e.target.closest('#wa-btn-trash');
+                    if (trashTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        currentTranscript = '';
+                        ctrl.revertDockToIdle();
+                        return;
+                    }
+
+                    const pauseTarget = e.target.closest('#wa-btn-pause');
+                    if (pauseTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ctrl.togglePause();
+                        return;
+                    }
+
+                    const sendTarget = e.target.closest('#wa-btn-send');
+                    if (sendTarget) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ctrl.sendRecording();
+                        return;
+                    }
+                }, true);
+            }
         })(); 
     </script>
     """,
@@ -1193,37 +1231,49 @@ if "uploader_key" not in st.session_state:
 
 # ── Sidebar (Branding, Chat Bars & Memory Vault) ──
 with st.sidebar:
-    # 1. Brand Identity
+    # 1. Brand Identity (Clean, professional, without flashy AI badges)
     st.markdown("""
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 4px 0;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 4px 0;">
         <div style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%); border-radius: 12px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.12); flex-shrink: 0;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
         </div>
         <div>
-            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16.5px; color: var(--ink); line-height: 1.2;">Custom AI Agent</div>
-            <div style="font-size: 11.5px; color: var(--ink-muted); font-weight: 500;">Persistent Vector Memory</div>
+            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; color: var(--ink); line-height: 1.2;">Custom AI Agent</div>
+            <div style="font-size: 11.5px; color: var(--ink-muted); font-weight: 500;">Personal Assistant</div>
         </div>
-    </div>
-    <div style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 9999px; margin-bottom: 16px;">
-        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-        FAISS Vector Store Active
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. Primary Action: New Chat
+    # 2. Primary Action: New Chat (ChatGPT-style draft creation)
     if st.button("New Chat", icon=":material/add:", use_container_width=True, key="new_chat_btn", help="Start a new conversation"):
-        new_id = f"chat_{int(time.time() * 1000)}"
-        st.session_state.chats[new_id] = {
-            "id": new_id,
-            "title": "New Chat",
-            "messages": [],
-            "created_at": time.time(),
-        }
-        st.session_state.active_chat_id = new_id
+        curr_active = st.session_state.chats.get(st.session_state.active_chat_id, {})
+        if not curr_active.get("messages"):
+            # Already in an empty new chat
+            st.rerun()
+        
+        # Check if an existing empty chat is available to reuse
+        empty_id = next((c_id for c_id, c_data in st.session_state.chats.items() if not c_data.get("messages")), None)
+        if empty_id:
+            st.session_state.active_chat_id = empty_id
+        else:
+            new_id = f"chat_{int(time.time() * 1000)}"
+            st.session_state.chats[new_id] = {
+                "id": new_id,
+                "title": "New Chat",
+                "messages": [],
+                "created_at": time.time(),
+            }
+            st.session_state.active_chat_id = new_id
         st.rerun()
 
-    # 3. Chat Bars (Recent Conversations)
-    total_chats = len(st.session_state.chats)
+    # 3. Chat Bars (Only display non-empty, saved conversations like ChatGPT)
+    sorted_all_chats = sorted(st.session_state.chats.items(), key=lambda x: x[1].get("created_at", 0), reverse=True)
+    saved_chats = [
+        (c_id, c_data) for c_id, c_data in sorted_all_chats 
+        if len(c_data.get("messages", [])) > 0
+    ]
+    total_chats = len(saved_chats)
+
     st.markdown(f"""
     <div style="display: flex; align-items: center; justify-content: space-between; margin: 12px 0 6px 0;">
         <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">Conversations</span>
@@ -1231,44 +1281,38 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(height=190):
-        sorted_chats = sorted(st.session_state.chats.items(), key=lambda x: x[1].get("created_at", 0), reverse=True)
-        for c_id, c_data in sorted_chats:
-            is_active = (c_id == st.session_state.active_chat_id)
-            
-            # Automatically resolve real conversation title from first human message
-            title_text = c_data.get("title", "New Chat")
-            if (title_text == "New Chat" or not title_text) and c_data.get("messages"):
-                for m in c_data["messages"]:
-                    if m.type == "human" and m.content:
-                        clean_t = clean_display_text(m.content).strip()
-                        words = clean_t.split()
-                        short_t = " ".join(words[:4])
-                        if len(words) > 4 or len(clean_t) > 22:
-                            short_t = short_t[:20].rstrip() + "..."
-                        if short_t:
-                            title_text = short_t
-                            c_data["title"] = short_t
-                        break
-
-            display_label = title_text[:18] + "..." if len(title_text) > 20 else title_text
-            icon = ":material/chat_bubble:" if is_active else ":material/chat_bubble_outline:"
-            btn_type = "primary" if is_active else "secondary"
-            c_col1, c_col2 = st.columns([5, 1])
-            with c_col1:
-                if st.button(display_label, key=f"chat_nav_{c_id}", icon=icon, use_container_width=True, type=btn_type, help=title_text):
-                    st.session_state.active_chat_id = c_id
-                    st.rerun()
-            with c_col2:
-                if st.button(" ", key=f"chat_del_{c_id}", icon=":material/delete_outline:", help="Delete conversation"):
-                    if len(st.session_state.chats) > 1:
+    if saved_chats:
+        with st.container(height=190):
+            for c_id, c_data in saved_chats:
+                is_active = (c_id == st.session_state.active_chat_id)
+                title_text = c_data.get("title", "Conversation")
+                display_label = title_text[:18] + "..." if len(title_text) > 20 else title_text
+                icon = ":material/chat_bubble:" if is_active else ":material/chat_bubble_outline:"
+                btn_type = "primary" if is_active else "secondary"
+                c_col1, c_col2 = st.columns([5, 1])
+                with c_col1:
+                    if st.button(display_label, key=f"chat_nav_{c_id}", icon=icon, use_container_width=True, type=btn_type, help=title_text):
+                        st.session_state.active_chat_id = c_id
+                        st.rerun()
+                with c_col2:
+                    if st.button(" ", key=f"chat_del_{c_id}", icon=":material/delete_outline:", help="Delete conversation"):
                         del st.session_state.chats[c_id]
                         if st.session_state.active_chat_id == c_id:
-                            st.session_state.active_chat_id = list(st.session_state.chats.keys())[0]
-                    else:
-                        st.session_state.chats[c_id]["messages"] = []
-                        st.session_state.chats[c_id]["title"] = "New Chat"
-                    st.rerun()
+                            remaining = [k for k, v in st.session_state.chats.items() if len(v.get("messages", [])) > 0]
+                            if remaining:
+                                st.session_state.active_chat_id = remaining[0]
+                            else:
+                                new_id = f"chat_{int(time.time() * 1000)}"
+                                st.session_state.chats[new_id] = {
+                                    "id": new_id,
+                                    "title": "New Chat",
+                                    "messages": [],
+                                    "created_at": time.time(),
+                                }
+                                st.session_state.active_chat_id = new_id
+                        st.rerun()
+    else:
+        st.markdown("<div style='font-size: 11.5px; color: var(--ink-subtle); padding: 10px 4px;'>No saved conversations yet. Start typing or speaking to begin!</div>", unsafe_allow_html=True)
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
 
@@ -1376,8 +1420,6 @@ with st.sidebar:
 
 # ── Main Chat Area Header (Empty State) ──
 if not st.session_state.messages:
-    mem_count = len(st.session_state.memory_store.get_all_memories())
-    
     # Dynamic time-of-day greeting
     hour = datetime.now().hour
     if 5 <= hour < 12:
@@ -1390,18 +1432,14 @@ if not st.session_state.messages:
         greeting_time = "Welcome back"
 
     st.markdown(f"""
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 2vh; text-align: center; animation: fadeIn 0.8s ease;">
-        <div style="display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--hairline); color: var(--ink-muted); font-size: 11.5px; font-weight: 600; padding: 4px 14px; border-radius: 9999px; margin-bottom: 20px; box-shadow: var(--shadow-subtle);">
-            <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-            FAISS VECTOR MEMORY ACTIVE &bull; {mem_count} FACTS STORED
-        </div>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 4vh; text-align: center; animation: fadeIn 0.8s ease;">
         <div class="hero-aura">
             <div class="hero-logo-box">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
             </div>
         </div>
         <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--ink); font-size: 36px; letter-spacing: -0.03em; margin: 0 0 8px 0;">{greeting_time}</h1>
-        <p style="color: var(--ink-muted); font-size: 16px; max-width: 540px; line-height: 1.5; margin: 0 0 32px 0;">Your autonomous AI assistant powered by Gemini 3.5 Flash with persistent long-term semantic memory across conversations.</p>
+        <p style="color: var(--ink-muted); font-size: 16px; max-width: 540px; line-height: 1.5; margin: 0 0 32px 0;">Where should we begin? Type a message or click the mic to speak.</p>
     </div>
     <style>@keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(10px); }} to {{ opacity: 1; transform: translateY(0); }} }}</style>
     """, unsafe_allow_html=True)
@@ -1409,7 +1447,7 @@ if not st.session_state.messages:
     st.markdown("<div class='suggestion-grid' style='max-width: 760px; margin: 0 auto 32px auto;'>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Memory Vault: What do you remember about me?", icon=":material/psychology:", key="chip_mem", use_container_width=True):
+        if st.button("Memory: What do you remember about me?", icon=":material/psychology:", key="chip_mem", use_container_width=True):
             st.session_state.quick_query = "What do you remember about me from our past conversations?"
         if st.button("Ideation: 3 unique project ideas using AI", icon=":material/lightbulb:", key="chip_idea", use_container_width=True):
             st.session_state.quick_query = "Give me 3 unique project ideas using AI."
@@ -1433,8 +1471,8 @@ for msg in st.session_state.messages:
                 st.markdown(f"""
                 <details style="margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 6px 12px; font-size: 12px; cursor: pointer;">
                     <summary style="font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; user-select: none;">
-                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                        <span>Recalled {count} facts from your Memory Vault</span>
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #475569; display: inline-block;"></span>
+                        <span>Recalled {count} relevant facts</span>
                     </summary>
                     <ul style="margin: 6px 0 2px 0; padding-left: 18px; color: var(--ink-muted); line-height: 1.45;">
                         {items_html}
@@ -1448,46 +1486,10 @@ for msg in st.session_state.messages:
             latency = getattr(msg, "additional_kwargs", {}).get("latency")
             if latency:
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-muted);">
-                    <span>Responded in {latency:.2f}s &bull; Gemini 3.5 Flash</span>
-                    <span style="color: var(--ink-subtle);">Long-Term Vector Context Active</span>
+                <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
+                    <span>{latency:.2f}s</span>
                 </div>
                 """, unsafe_allow_html=True)
-
-# ── Fixed Bottom Elements (+ button) ──
-dock_col, _ = st.columns([1, 99])
-with dock_col:
-    st.markdown("<div class='action-btn-left' style='display: none;'></div>", unsafe_allow_html=True)
-    with st.popover(" ", icon=":material/add:", help="New Chat or Switch Conversations"):
-        st.markdown("<div style='font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--ink);'>Conversations</div>", unsafe_allow_html=True)
-        if st.button("Start New Chat", icon=":material/add_comment:", use_container_width=True, key="pop_new_chat"):
-            new_id = f"chat_{int(time.time() * 1000)}"
-            st.session_state.chats[new_id] = {
-                "id": new_id,
-                "title": "New Chat",
-                "messages": [],
-                "created_at": time.time(),
-            }
-            st.session_state.active_chat_id = new_id
-            st.rerun()
-        
-        st.markdown("<div style='font-size: 11px; font-weight: 700; color: var(--ink-muted); margin: 12px 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px;'>Recent Chats</div>", unsafe_allow_html=True)
-        pop_sorted_chats = sorted(st.session_state.chats.items(), key=lambda x: x[1].get("created_at", 0), reverse=True)
-        for c_id, c_data in pop_sorted_chats[:6]:
-            is_active = (c_id == st.session_state.active_chat_id)
-            title = c_data.get("title", "New Chat")
-            display_title = title[:24] + "..." if len(title) > 26 else title
-            icon_name = ":material/check_circle:" if is_active else ":material/chat_bubble_outline:"
-            btn_type = "primary" if is_active else "secondary"
-            if st.button(display_title, key=f"pop_chat_{c_id}", icon=icon_name, use_container_width=True, type=btn_type):
-                st.session_state.active_chat_id = c_id
-                st.rerun()
-
-        st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 12px 0 8px 0;'>", unsafe_allow_html=True)
-        if st.button("Reset Long-Term Memory", icon=":material/delete_outline:", use_container_width=True, help="Clear FAISS vector store"):
-            st.session_state.memory_store.clear_memory()
-            st.toast("Long-term memory cleared!")
-            st.rerun()
 
 # ── Chat Input ──
 user_query = st.chat_input("Message the agent...")
@@ -1501,13 +1503,14 @@ query = user_query
 if query:
     active_chat = st.session_state.chats[st.session_state.active_chat_id]
     
-    # Auto-generate conversational title if still default
-    if active_chat["title"] == "New Chat":
-        words = query.strip().split()
-        short_title = " ".join(words[:5])
-        if len(words) > 5 or len(query.strip()) > 26:
-            short_title = short_title[:24].rstrip() + "..."
-        active_chat["title"] = short_title if short_title else "Chat"
+    # Auto-generate clean conversational heading if new chat
+    if active_chat.get("title") == "New Chat":
+        clean_q = clean_display_text(query).strip()
+        words = clean_q.split()
+        short_title = " ".join(words[:4])
+        if len(words) > 4 or len(clean_q) > 22:
+            short_title = short_title[:20].rstrip() + "..."
+        active_chat["title"] = short_title.capitalize() if short_title else "Conversation"
 
     active_chat["messages"].append(HumanMessage(content=query))
     st.session_state.messages = active_chat["messages"]
@@ -1519,7 +1522,7 @@ if query:
         start_time = time.time()
 
         # 1. Recall relevant memories
-        with st.spinner("Recalling memory..."):
+        with st.spinner("Thinking..."):
             past_context = st.session_state.memory_store.recall_memories(query)
 
         # Show citation chip if memories recalled
@@ -1530,8 +1533,8 @@ if query:
             st.markdown(f"""
             <details style="margin-bottom: 12px; background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 6px 12px; font-size: 12px; cursor: pointer;">
                 <summary style="font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; user-select: none;">
-                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                    <span>Recalled {count} facts from your Memory Vault</span>
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #475569; display: inline-block;"></span>
+                    <span>Recalled {count} relevant facts</span>
                 </summary>
                 <ul style="margin: 6px 0 2px 0; padding-left: 18px; color: var(--ink-muted); line-height: 1.45;">
                     {items_html}
@@ -1573,9 +1576,8 @@ if query:
                 st.markdown(f"<div class='mem-toast'>Learned: {fact}</div>", unsafe_allow_html=True)
 
             st.markdown(f"""
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-muted);">
-                <span>Responded in {latency:.2f}s &bull; Gemini 3.5 Flash</span>
-                <span style="color: var(--ink-subtle);">Long-Term Vector Context Active</span>
+            <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-subtle);">
+                <span>{latency:.2f}s</span>
             </div>
             """, unsafe_allow_html=True)
             st.rerun()
@@ -1586,4 +1588,5 @@ if query:
                 st.error("**Rate Limit Exceeded:** Please wait 30 seconds and try again.")
             else:
                 st.error(f"**Error:** {error_msg}")
+
 
