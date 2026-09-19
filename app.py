@@ -38,18 +38,19 @@ st.markdown("""
         --shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
     }
 
-    * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    /* Apply Inter font specifically, avoiding icon fonts */
+    html, body, [class*="st-"], .stApp, p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         letter-spacing: -0.2px;
     }
 
-    /* Fix Streamlit Material Icons */
-    .material-symbols-rounded, .material-icons, [class*="icon"] {
+    /* Force Material Icons to render correctly */
+    .material-symbols-rounded, .material-icons, [class*="icon"], [data-testid="stSidebarCollapsedControl"] svg {
         font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
     }
 
     html, body, .stApp, [data-testid="stAppViewContainer"] {
-        background-color: var(--canvas) !important;
+        background-color: var(--surface-1) !important; /* Pure white for chat */
         color: var(--ink) !important;
         overflow-x: hidden !important;
     }
@@ -73,7 +74,7 @@ st.markdown("""
 
     /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: var(--surface-2) !important;
+        background-color: var(--canvas) !important; /* Soft grey for sidebar */
         border-right: 1px solid var(--hairline) !important;
     }
 
