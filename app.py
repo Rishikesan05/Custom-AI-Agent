@@ -349,111 +349,7 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* 3. Voice Recorder: Circular icon when idle, expands into full controls on click */
-    [data-testid="stAudioInput"] {
-        position: fixed !important;
-        bottom: 22px !important;
-        left: calc(50% + 274px) !important;
-        transform: none !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
-        height: 46px !important;
-        min-height: 46px !important;
-        z-index: 1000 !important;
-        background: var(--surface-1) !important;
-        border: 1px solid var(--hairline) !important;
-        border-radius: 50% !important;
-        box-shadow: var(--shadow-floating) !important;
-        padding: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-sizing: border-box !important;
-        cursor: pointer !important;
-        overflow: hidden !important;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.25s ease, box-shadow 0.25s ease !important;
-    }
-    
-    [data-testid="stAudioInput"]:hover {
-        border-color: var(--ink-subtle) !important;
-        transform: scale(1.05);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    [data-testid="stAudioInput"] > div {
-        border: none !important;
-        background: transparent !important;
-        width: 100% !important;
-        height: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 0 !important;
-    }
-
-    [data-testid="stAudioInputActionButton"] {
-        width: 46px !important;
-        height: 46px !important;
-        min-width: 46px !important;
-        min-height: 46px !important;
-        border: none !important;
-        background: transparent !important;
-        border-radius: 50% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-    }
-
-    /* Idle state: hide timeline and timecode so only the mic icon shows */
-    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) [data-testid="stAudioInputWaveSurfer"],
-    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) [data-testid="stAudioInputWaveformTimeCode"],
-    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) div:has(> [data-testid="stAudioInputWaveSurfer"]) {
-        display: none !important;
-    }
-
-    /* Recording / Active state: smooth expansion into recording control bar */
-    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]),
-    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]),
-    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]),
-    [data-testid="stAudioInput"]:has(audio) {
-        width: 260px !important;
-        min-width: 260px !important;
-        max-width: 260px !important;
-        border-radius: var(--radius-pill) !important;
-        padding: 0 12px !important;
-        justify-content: space-between !important;
-        transform: none !important;
-    }
-
-    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]) [data-testid="stAudioInputWaveSurfer"],
-    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]) [data-testid="stAudioInputWaveformTimeCode"],
-    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]) [data-testid="stAudioInputWaveSurfer"],
-    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]) [data-testid="stAudioInputWaveformTimeCode"],
-    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]) [data-testid="stAudioInputWaveSurfer"],
-    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]) [data-testid="stAudioInputWaveformTimeCode"],
-    [data-testid="stAudioInput"]:has(audio) [data-testid="stAudioInputWaveSurfer"],
-    [data-testid="stAudioInput"]:has(audio) [data-testid="stAudioInputWaveformTimeCode"] {
-        display: flex !important;
-    }
-
-    /* When sidebar is expanded on desktop, dynamically offset the unified bottom dock */
-    @media (min-width: 821px) {
-        [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stColumn"]:has(.action-btn-left) {
-            left: calc(50% + 150px - 320px) !important;
-        }
-        [data-testid="stSidebar"][aria-expanded="true"] ~ * .stChatInput > div {
-            left: calc(50% + 150px - 262px) !important;
-        }
-        [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stAudioInput"] {
-            left: calc(50% + 150px + 274px) !important;
-        }
-    }
-
-    /* Responsive Mobile Layout */
+    /* Responsive Mobile Layout for Bottom Dock */
     @media (max-width: 820px) {
         [data-testid="stColumn"]:has(.action-btn-left) {
             left: 12px !important;
@@ -475,29 +371,31 @@ st.markdown("""
             height: 40px !important;
             min-height: 40px !important;
         }
-        [data-testid="stAudioInput"] {
-            left: auto !important;
-            right: 12px !important;
-            width: 40px !important;
-            min-width: 40px !important;
-            max-width: 40px !important;
-            bottom: 16px !important;
-            height: 40px !important;
-            min-height: 40px !important;
-            padding: 0 !important;
-        }
-        [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]),
-        [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]),
-        [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]),
-        [data-testid="stAudioInput"]:has(audio) {
-            width: 220px !important;
-            min-width: 220px !important;
-            max-width: 220px !important;
-            right: 12px !important;
-        }
     }
 
     /* Base styling for circular floating '+' action button */
+    [data-testid="stColumn"]:has(.action-btn-left) {
+        position: fixed !important;
+        bottom: 22px !important;
+        left: calc(50% - 320px) !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        z-index: 1000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    @media (min-width: 821px) {
+        [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stColumn"]:has(.action-btn-left) {
+            left: calc(50% + 150px - 320px) !important;
+        }
+        [data-testid="stSidebar"][aria-expanded="true"] ~ * .stChatInput > div {
+            left: calc(50% + 150px - 262px) !important;
+        }
+    }
     [data-testid="stColumn"]:has(.action-btn-left) {
         position: fixed !important;
         bottom: 22px !important;
@@ -641,33 +539,36 @@ st.markdown("""
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     }
 
-    /* Assistant Message: Clean left-aligned layout matching user text */
+    /* Assistant Message: Clean left-aligned bubble matching user message */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="assistant"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="ai"]) {
-        background: transparent !important;
-        border: none !important;
+        background: var(--surface-1) !important;
+        border: 1px solid var(--hairline) !important;
+        color: var(--ink) !important;
         margin-left: 0 !important;
         margin-right: auto !important;
-        max-width: 95% !important;
-        padding: 8px 0 !important;
+        border-radius: 20px 20px 20px 6px !important;
+        max-width: 85% !important;
+        padding: 16px 22px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     }
     
     [data-testid="stChatMessage"] [data-testid="stChatAvatar"],
     [data-testid="stChatMessage"] [data-testid*="stChatMessageAvatar"] {
         background: transparent !important;
-        border-radius: 10px !important;
+        border-radius: 50% !important;
         margin: 0 !important;
         padding: 0 !important;
         flex-shrink: 0 !important;
     }
 
     [data-testid="stChatMessage"] img {
-        border-radius: 10px !important;
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        min-height: 36px !important;
+        border-radius: 50% !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
         object-fit: contain !important;
         display: block !important;
     }
@@ -874,6 +775,370 @@ components.html(
             });
             
         }, 500); 
+
+        // 3. WhatsApp-Style Voice Recorder Component
+        (function() {
+            const parentDoc = window.parent.document;
+            if (parentDoc.getElementById('wa-voice-container')) return;
+
+            const styleEl = parentDoc.createElement('style');
+            styleEl.innerHTML = `
+                #wa-voice-container {
+                    position: fixed;
+                    bottom: 22px;
+                    left: calc(50% + 150px + 274px);
+                    z-index: 10001;
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                }
+                @media (max-width: 820px) {
+                    #wa-voice-container {
+                        left: auto !important;
+                        right: 12px !important;
+                        bottom: 16px !important;
+                    }
+                }
+                #wa-mic-btn {
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    color: #0f172a;
+                }
+                #wa-mic-btn:hover {
+                    transform: scale(1.06);
+                    border-color: #94a3b8;
+                    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+                }
+                #wa-record-bar {
+                    display: none;
+                    position: fixed;
+                    bottom: 22px;
+                    left: calc(50% + 150px - 262px);
+                    width: 582px;
+                    height: 46px;
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 9999px;
+                    box-shadow: 0 14px 35px -5px rgba(0, 0, 0, 0.12);
+                    z-index: 10002;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 0 12px;
+                    box-sizing: border-box;
+                    animation: waSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                @media (max-width: 820px) {
+                    #wa-record-bar {
+                        left: 12px !important;
+                        right: 12px !important;
+                        width: calc(100% - 24px) !important;
+                        bottom: 16px !important;
+                    }
+                }
+                @keyframes waSlideUp {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .wa-rec-dot {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: #ef4444;
+                    animation: waPulse 1.2s infinite;
+                }
+                @keyframes waPulse {
+                    0% { transform: scale(0.85); opacity: 0.6; }
+                    50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+                    100% { transform: scale(0.85); opacity: 0.6; }
+                }
+                .wa-action-btn {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                }
+                .wa-trash-btn {
+                    background: #fee2e2;
+                    color: #ef4444;
+                }
+                .wa-trash-btn:hover {
+                    background: #fecaca;
+                    transform: scale(1.08);
+                }
+                .wa-pause-btn {
+                    background: #f1f5f9;
+                    color: #0f172a;
+                }
+                .wa-pause-btn:hover {
+                    background: #e2e8f0;
+                    transform: scale(1.08);
+                }
+                .wa-send-btn {
+                    background: #10b981;
+                    color: #ffffff;
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+                }
+                .wa-send-btn:hover {
+                    background: #059669;
+                    transform: scale(1.08);
+                }
+                .wa-timer {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #ef4444;
+                    font-variant-numeric: tabular-nums;
+                    min-width: 44px;
+                }
+                .wa-waveform {
+                    display: flex;
+                    align-items: center;
+                    gap: 3px;
+                    height: 24px;
+                    flex: 1;
+                    max-width: 220px;
+                    justify-content: center;
+                }
+                .wa-wave-bar {
+                    width: 3px;
+                    height: 6px;
+                    border-radius: 3px;
+                    background: #6366f1;
+                    transition: height 0.08s ease;
+                }
+            `;
+            parentDoc.head.appendChild(styleEl);
+
+            const container = parentDoc.createElement('div');
+            container.id = 'wa-voice-container';
+            container.innerHTML = `
+                <div id="wa-mic-btn" title="Voice record like WhatsApp">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" x2="12" y1="19" y2="22"/>
+                    </svg>
+                </div>
+                <div id="wa-record-bar">
+                    <button id="wa-btn-trash" class="wa-action-btn wa-trash-btn" title="Delete recording">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="wa-rec-dot" id="wa-rec-dot"></div>
+                        <div class="wa-timer" id="wa-timer">00:00</div>
+                    </div>
+                    <div class="wa-waveform" id="wa-waveform">
+                        ${Array(16).fill(0).map(() => '<div class="wa-wave-bar"></div>').join('')}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button id="wa-btn-pause" class="wa-action-btn wa-pause-btn" title="Pause / Continue">
+                            <svg id="wa-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                                <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+                            </svg>
+                            <svg id="wa-icon-play" style="display: none; margin-left: 2px;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="6,4 20,12 6,20"/>
+                            </svg>
+                        </button>
+                        <button id="wa-btn-send" class="wa-action-btn wa-send-btn" title="Send voice message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            parentDoc.body.appendChild(container);
+
+            let isRecording = false;
+            let isPaused = false;
+            let mediaRecorder = null;
+            let audioStream = null;
+            let audioContext = null;
+            let analyser = null;
+            let animFrame = null;
+            let timerInterval = null;
+            let secondsElapsed = 0;
+            let recognition = null;
+            let finalTranscript = '';
+
+            const micBtn = parentDoc.getElementById('wa-mic-btn');
+            const recordBar = parentDoc.getElementById('wa-record-bar');
+            const trashBtn = parentDoc.getElementById('wa-btn-trash');
+            const pauseBtn = parentDoc.getElementById('wa-btn-pause');
+            const sendBtn = parentDoc.getElementById('wa-btn-send');
+            const timerEl = parentDoc.getElementById('wa-timer');
+            const iconPause = parentDoc.getElementById('wa-icon-pause');
+            const iconPlay = parentDoc.getElementById('wa-icon-play');
+            const waveBars = parentDoc.querySelectorAll('.wa-wave-bar');
+            const recDot = parentDoc.getElementById('wa-rec-dot');
+
+            function formatTime(secs) {
+                const m = Math.floor(secs / 60).toString().padStart(2, '0');
+                const s = (secs % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            }
+
+            function updateWaveform() {
+                if (!isRecording || isPaused) return;
+                if (analyser) {
+                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(dataArray);
+                    waveBars.forEach((bar, idx) => {
+                        const val = dataArray[idx * 2] || 0;
+                        const h = Math.max(4, Math.min(22, (val / 255) * 22 + 4));
+                        bar.style.height = `${h}px`;
+                    });
+                } else {
+                    waveBars.forEach((bar) => {
+                        const h = Math.floor(Math.random() * 16) + 4;
+                        bar.style.height = `${h}px`;
+                    });
+                }
+                animFrame = requestAnimationFrame(updateWaveform);
+            }
+
+            async function startRecording() {
+                try {
+                    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const source = audioContext.createMediaStreamSource(audioStream);
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 64;
+                    source.connect(analyser);
+
+                    mediaRecorder = new MediaRecorder(audioStream);
+                    mediaRecorder.start();
+
+                    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRec) {
+                        recognition = new SpeechRec();
+                        recognition.continuous = true;
+                        recognition.interimResults = true;
+                        recognition.lang = 'en-US';
+                        finalTranscript = '';
+                        recognition.onresult = (event) => {
+                            let text = '';
+                            for (let i = 0; i < event.results.length; i++) {
+                                text += event.results[i][0].transcript + ' ';
+                            }
+                            finalTranscript = text.trim();
+                        };
+                        recognition.start();
+                    }
+
+                    isRecording = true;
+                    isPaused = false;
+                    secondsElapsed = 0;
+                    timerEl.innerText = "00:00";
+                    iconPause.style.display = "block";
+                    iconPlay.style.display = "none";
+                    recDot.style.animationPlayState = "running";
+
+                    recordBar.style.display = "flex";
+                    micBtn.style.display = "none";
+
+                    timerInterval = setInterval(() => {
+                        if (!isPaused) {
+                            secondsElapsed++;
+                            timerEl.innerText = formatTime(secondsElapsed);
+                        }
+                    }, 1000);
+
+                    updateWaveform();
+                } catch (err) {
+                    console.error("Mic access denied or error:", err);
+                    alert("Microphone access denied. Please allow microphone permissions in your browser.");
+                }
+            }
+
+            function stopAndCleanup() {
+                isRecording = false;
+                isPaused = false;
+                if (timerInterval) clearInterval(timerInterval);
+                if (animFrame) cancelAnimationFrame(animFrame);
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    try { mediaRecorder.stop(); } catch(e) {}
+                }
+                if (audioStream) {
+                    audioStream.getTracks().forEach(track => track.stop());
+                }
+                if (audioContext && audioContext.state !== 'closed') {
+                    try { audioContext.close(); } catch(e) {}
+                }
+                if (recognition) {
+                    try { recognition.stop(); } catch(e) {}
+                }
+                recordBar.style.display = "none";
+                micBtn.style.display = "flex";
+            }
+
+            trashBtn.onclick = () => {
+                finalTranscript = '';
+                stopAndCleanup();
+            };
+
+            pauseBtn.onclick = () => {
+                if (!isRecording) return;
+                if (!isPaused) {
+                    isPaused = true;
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.pause();
+                    }
+                    if (recognition) {
+                        try { recognition.stop(); } catch(e) {}
+                    }
+                    iconPause.style.display = "none";
+                    iconPlay.style.display = "block";
+                    recDot.style.animationPlayState = "paused";
+                    waveBars.forEach(bar => bar.style.height = '6px');
+                } else {
+                    isPaused = false;
+                    if (mediaRecorder && mediaRecorder.state === 'paused') {
+                        mediaRecorder.resume();
+                    }
+                    if (recognition) {
+                        try { recognition.start(); } catch(e) {}
+                    }
+                    iconPause.style.display = "block";
+                    iconPlay.style.display = "none";
+                    recDot.style.animationPlayState = "running";
+                    updateWaveform();
+                }
+            };
+
+            sendBtn.onclick = () => {
+                const textToSend = finalTranscript.trim();
+                stopAndCleanup();
+
+                if (textToSend) {
+                    const textarea = parentDoc.querySelector('.stChatInput textarea');
+                    const submitBtn = parentDoc.querySelector('[data-testid="stChatInputSubmitButton"]');
+                    if (textarea && submitBtn) {
+                        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                        nativeSetter.call(textarea, textToSend);
+                        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                        setTimeout(() => {
+                            submitBtn.click();
+                        }, 80);
+                    }
+                }
+            };
+
+            micBtn.onclick = startRecording;
+        })(); 
     </script>
     """,
     height=0,
@@ -1189,9 +1454,7 @@ for msg in st.session_state.messages:
                 </div>
                 """, unsafe_allow_html=True)
 
-# ── Fixed Bottom Elements (Voice & + button) ──
-audio_val = st.audio_input("Speak to the agent", label_visibility="collapsed")
-
+# ── Fixed Bottom Elements (+ button) ──
 dock_col, _ = st.columns([1, 99])
 with dock_col:
     st.markdown("<div class='action-btn-left' style='display: none;'></div>", unsafe_allow_html=True)
@@ -1226,21 +1489,6 @@ with dock_col:
             st.toast("Long-term memory cleared!")
             st.rerun()
 
-# ── Voice Input (Logic) ──
-voice_query = None
-if audio_val:
-    audio_id = id(audio_val)
-    if st.session_state.get("last_audio_id") != audio_id:
-        with st.spinner("Transcribing..."):
-            try:
-                r = sr.Recognizer()
-                with sr.AudioFile(audio_val) as source:
-                    audio = r.record(source)
-                voice_query = r.recognize_google(audio)
-                st.session_state.last_audio_id = audio_id
-            except Exception as e:
-                st.warning(f"Could not transcribe: {e}")
-
 # ── Chat Input ──
 user_query = st.chat_input("Message the agent...")
 
@@ -1248,8 +1496,7 @@ if "quick_query" in st.session_state:
     user_query = st.session_state.quick_query
     del st.session_state.quick_query
 
-# voice_query is fetched from sidebar
-query = voice_query if voice_query else user_query
+query = user_query
 
 if query:
     active_chat = st.session_state.chats[st.session_state.active_chat_id]
