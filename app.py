@@ -1450,27 +1450,74 @@ if "active_chat_id" not in st.session_state or st.session_state.active_chat_id n
 active_chat = st.session_state.chats[st.session_state.active_chat_id]
 st.session_state.messages = active_chat["messages"]
 
-# ── Clean URL & Multi-User Memory Isolation (Zero URL Leakage) ──
+# ── Device-Persistent Vault & Memory Isolation (localStorage Bridge) ──
 import uuid
-import hashlib
 
-# 1. Strip any ?user= from query params so address bar remains 100% clean and private
-if "user" in st.query_params:
+# 1. Capture vault ID if passed from browser localStorage sync
+if "v" in st.query_params:
+    raw_v = str(st.query_params["v"]).strip().lower()
+    clean_v = "".join(c for c in raw_v if c.isalnum() or c in ("-", "_"))
+    if clean_v:
+        st.session_state.vault_id = clean_v
     try:
-        del st.query_params["user"]
+        del st.query_params["v"]
     except Exception:
         pass
 
-# 2. Stable default vault so memories persist across refreshes without disappearing
-if "user_profile_id" not in st.session_state:
-    st.session_state.user_profile_id = "default"
+if "vault_id" not in st.session_state:
+    st.session_state.vault_id = "default"
 
-current_uid = st.session_state.user_profile_id
+current_vault = st.session_state.vault_id
 
-if "memory_store" not in st.session_state or getattr(st.session_state.memory_store, "user_id", None) != current_uid:
-    st.session_state.memory_store = MemoryStore(user_id=current_uid)
+if "memory_store" not in st.session_state or getattr(st.session_state.memory_store, "user_id", None) != current_vault:
+    st.session_state.memory_store = MemoryStore(user_id=current_vault)
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
+
+# 2. Synchronize active vault ID with browser localStorage
+components.html(
+    f"""
+    <script>
+        (function() {{
+            try {{
+                const parentWin = window.parent || window;
+                const getStore = () => {{
+                    try {{ return parentWin.localStorage || localStorage; }} catch(e) {{ return localStorage; }}
+                }};
+                const store = getStore();
+                let localVault = store.getItem('agent_vault_id');
+                const pyVault = '{current_vault}';
+
+                if (pyVault && pyVault !== 'default' && localVault !== pyVault) {{
+                    store.setItem('agent_vault_id', pyVault);
+                    try {{ localStorage.setItem('agent_vault_id', pyVault); }} catch(e) {{}}
+                    localVault = pyVault;
+                }} else if (localVault && localVault !== 'default' && pyVault === 'default') {{
+                    const u = new URL(parentWin.location.href);
+                    u.searchParams.set('v', localVault);
+                    parentWin.location.replace(u.href);
+                    return;
+                }} else if (!localVault || localVault === 'default') {{
+                    const randHex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
+                    const newDeviceVault = 'user-' + randHex;
+                    store.setItem('agent_vault_id', newDeviceVault);
+                    try {{ localStorage.setItem('agent_vault_id', newDeviceVault); }} catch(e) {{}}
+                    const u = new URL(parentWin.location.href);
+                    u.searchParams.set('v', newDeviceVault);
+                    parentWin.location.replace(u.href);
+                    return;
+                }}
+
+                if (parentWin.location.search) {{
+                    parentWin.history.replaceState({{}}, '', parentWin.location.pathname);
+                }}
+            }} catch (e) {{}}
+        }})();
+    </script>
+    """,
+    height=0,
+    width=0,
+)
 
 # ── Sidebar (Branding, Chat Bars & Memory Vault) ──
 with st.sidebar:
@@ -1605,41 +1652,61 @@ with st.sidebar:
             st.toast("Vector memory reset!")
             st.rerun()
 
-    with st.expander("Vault Sync & Privacy", expanded=False):
-        vault_label = "default" if current_uid == "default" else current_uid
+    with st.expander("Vault Settings & Identity", expanded=False):
         st.markdown(f"""
-        <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 8px;">
-            <div><strong>Active Vault:</strong> <code style="color: var(--brand-primary);">{vault_label}</code></div>
-            <div style="font-size: 10.5px; color: var(--ink-subtle); margin-top: 4px;">To access your memories across devices, enter your secret Vault Key.</div>
+        <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 600;">Active Vault:</span>
+                <code style="color: var(--brand-primary); font-size: 12px; font-weight: 700; background: var(--surface-2); padding: 2px 8px; border-radius: 6px;">{current_vault}</code>
+            </div>
+            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">Permanent to this device. Use this ID to sync memories across devices.</div>
         </div>
         """, unsafe_allow_html=True)
 
-        with st.form(key="vault_key_form", border=False):
-            vault_key_val = st.text_input(
-                "Private Vault Key",
-                value=st.session_state.get("custom_vault_key", ""),
-                placeholder="e.g. rishi-vault",
-                help="Enter your private key to sync memories across devices safely.",
-                label_visibility="collapsed"
-            )
-            if st.form_submit_button("Connect Vault Key", icon=":material/key:", use_container_width=True):
-                clean_key = "".join(c for c in vault_key_val.strip() if c.isalnum() or c in ("-", "_")).lower()
-                if clean_key:
-                    st.session_state.custom_vault_key = clean_key
-                    st.session_state.user_profile_id = f"v_{clean_key}"
-                    st.session_state.memory_store = MemoryStore(user_id=st.session_state.user_profile_id)
-                    st.toast(f"Connected to vault: {clean_key}")
+        # 1. Rename / Edit Vault ID
+        with st.form(key="rename_vault_form", border=False):
+            st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>RENAME VAULT ID</div>", unsafe_allow_html=True)
+            new_name_val = st.text_input("New Vault ID", value=current_vault, placeholder="e.g. alex or my-vault", label_visibility="collapsed")
+            if st.form_submit_button("Save Name", icon=":material/edit:", use_container_width=True):
+                clean_new = "".join(c for c in new_name_val.strip() if c.isalnum() or c in ("-", "_")).lower()
+                if clean_new and clean_new != current_vault:
+                    MemoryStore.rename_vault(current_vault, clean_new)
+                    st.session_state.vault_id = clean_new
+                    st.session_state.memory_store = MemoryStore(user_id=clean_new)
+                    st.toast(f"Vault renamed to: {clean_new}")
                     st.rerun()
+                elif clean_new == current_vault:
+                    st.info("Vault already has this name.")
                 else:
-                    st.warning("Please enter a valid key name.")
+                    st.warning("Please enter valid letters or numbers.")
 
-        if current_uid != "default":
-            if st.button("Disconnect (Use Default Vault)", icon=":material/link_off:", use_container_width=True, key="btn_default_vault"):
-                st.session_state.user_profile_id = "default"
-                st.session_state.custom_vault_key = ""
-                st.session_state.memory_store = MemoryStore(user_id="default")
-                st.toast("Switched to Default Vault!")
-                st.rerun()
+        st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 10px 0;'>", unsafe_allow_html=True)
+
+        # 2. Connect to another Vault
+        with st.form(key="connect_vault_form", border=False):
+            st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>CONNECT TO ANOTHER VAULT</div>", unsafe_allow_html=True)
+            connect_val = st.text_input("Target Vault ID", placeholder="e.g. other-device-id", label_visibility="collapsed")
+            if st.form_submit_button("Connect Vault", icon=":material/link:", use_container_width=True):
+                clean_target = "".join(c for c in connect_val.strip() if c.isalnum() or c in ("-", "_")).lower()
+                if clean_target and clean_target != current_vault:
+                    st.session_state.vault_id = clean_target
+                    st.session_state.memory_store = MemoryStore(user_id=clean_target)
+                    st.toast(f"Connected to vault: {clean_target}")
+                    st.rerun()
+                elif clean_target == current_vault:
+                    st.info("Already connected to this vault.")
+                else:
+                    st.warning("Please enter a valid Vault ID.")
+
+        st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 10px 0;'>", unsafe_allow_html=True)
+
+        # 3. Create Fresh Vault
+        if st.button("Create Fresh Vault", icon=":material/add_box:", use_container_width=True, key="btn_create_new_vault", help="Start a new blank isolated vault"):
+            fresh_id = f"user-{uuid.uuid4().hex[:4]}"
+            st.session_state.vault_id = fresh_id
+            st.session_state.memory_store = MemoryStore(user_id=fresh_id)
+            st.toast(f"Created fresh vault: {fresh_id}")
+            st.rerun()
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
 

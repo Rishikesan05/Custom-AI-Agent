@@ -27,9 +27,27 @@ class MemoryStore:
                 allow_dangerous_deserialization=True
             )
         else:
-            # Initialize with a dummy document so it's ready to add and save
-            self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
-            self.vector_store.save_local(self.index_path)
+            # Check if root memory_index has existing memories to inherit
+            root_index = os.path.join(self.base_dir, "index.faiss")
+            if self.user_id != "default" and os.path.exists(root_index):
+                import shutil
+                try:
+                    for f in ["index.faiss", "index.pkl"]:
+                        src = os.path.join(self.base_dir, f)
+                        if os.path.exists(src):
+                            shutil.copy2(src, os.path.join(self.index_path, f))
+                    self.vector_store = FAISS.load_local(
+                        self.index_path,
+                        self.embeddings,
+                        allow_dangerous_deserialization=True
+                    )
+                except Exception:
+                    self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
+                    self.vector_store.save_local(self.index_path)
+            else:
+                # Initialize with a dummy document so it's ready to add and save
+                self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
+                self.vector_store.save_local(self.index_path)
 
     def save_memory(self, memory_text: str):
         """Save a new memory text into the FAISS index."""
@@ -76,4 +94,28 @@ class MemoryStore:
         """Clear all stored memories and reset the index."""
         self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
         self.vector_store.save_local(self.index_path)
+
+    @staticmethod
+    def rename_vault(old_uid: str, new_uid: str, base_dir="memory_index") -> bool:
+        """Safely copy/rename an existing vault directory to a new vault ID without data loss."""
+        import shutil
+        old_safe = "".join(c for c in str(old_uid) if c.isalnum() or c in ("-", "_")) if old_uid and old_uid != "default" else "default"
+        new_safe = "".join(c for c in str(new_uid) if c.isalnum() or c in ("-", "_")) if new_uid and new_uid != "default" else "default"
+        if not new_safe or old_safe == new_safe:
+            return False
+        
+        old_path = os.path.join(base_dir, old_safe) if old_safe != "default" else base_dir
+        new_path = os.path.join(base_dir, new_safe) if new_safe != "default" else base_dir
+        
+        try:
+            if os.path.exists(old_path) and os.path.exists(os.path.join(old_path, "index.faiss")):
+                os.makedirs(new_path, exist_ok=True)
+                for f in ["index.faiss", "index.pkl"]:
+                    src = os.path.join(old_path, f)
+                    if os.path.exists(src):
+                        shutil.copy2(src, os.path.join(new_path, f))
+                return True
+        except Exception as e:
+            print(f"Error migrating vault: {e}")
+        return False
 
