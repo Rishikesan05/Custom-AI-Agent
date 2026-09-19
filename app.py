@@ -176,7 +176,7 @@ st.markdown("""
     }
     
     [data-testid="stMainBlockContainer"] {
-        padding: 2rem 1.5rem 160px 1.5rem !important;
+        padding: 1.25rem 1.5rem 160px 1.5rem !important;
         max-width: 860px !important;
         margin: 0 auto !important;
     }
@@ -232,21 +232,49 @@ st.markdown("""
     }
 
     /* Sidebar Collapse Button inside Sidebar */
+    [data-testid="stSidebarCollapseButton"] {
+        position: absolute !important;
+        top: 10px !important;
+        right: 12px !important;
+        z-index: 100 !important;
+    }
     [data-testid="stSidebarCollapseButton"] button {
         border-radius: 8px !important;
         border: 1px solid var(--hairline) !important;
         background: var(--surface-1) !important;
         box-shadow: var(--shadow-subtle) !important;
         transition: all 0.2s ease !important;
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     [data-testid="stSidebarCollapseButton"] button:hover {
         background: var(--surface-3) !important;
+        border-color: var(--ink-subtle) !important;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Styling & Top Gap Elimination */
     [data-testid="stSidebar"] {
         background-color: var(--surface-2) !important;
         border-right: 1px solid var(--hairline) !important;
+    }
+    [data-testid="stSidebarHeader"] {
+        height: 0 !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        position: static !important;
+    }
+    [data-testid="stLogoSpacer"] {
+        display: none !important;
+    }
+    [data-testid="stSidebarUserContent"] {
+        padding-top: 10px !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
     }
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
         gap: 0.5rem;
@@ -1341,7 +1369,7 @@ if "uploader_key" not in st.session_state:
 with st.sidebar:
     # 1. Brand Identity (Clean, professional, without flashy AI badges)
     st.markdown("""
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 4px 0;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 2px 36px 2px 0;">
         <div style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%); border-radius: 12px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.12); flex-shrink: 0;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
         </div>
