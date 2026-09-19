@@ -173,63 +173,19 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Feature Cards Grid */
-    .features {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        max-width: 760px;
-        margin: 32px auto 0 auto;
-        padding: 0 16px;
+    /* Feature Cards Grid (Removed, but keeping generic grid styles for buttons if needed) */
+    .stButton > button {
+        width: 100%;
+        text-align: left;
     }
 
-    .feat {
-        background: var(--surface-1);
-        border: 1px solid var(--hairline);
-        border-radius: var(--radius-lg);
-        padding: 24px;
-        text-align: left;
+    /* Sidebar fake history item */
+    .sidebar-item {
         transition: all 0.2s ease;
     }
-
-    .feat:hover {
-        background: var(--surface-2);
-        border-color: var(--ink-subtle);
-    }
-
-    .feat-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--surface-3);
-        border: 1px solid var(--hairline);
-        border-radius: var(--radius);
-        width: 32px;
-        height: 32px;
-        margin-bottom: 16px;
-        color: var(--ink-muted);
-        font-size: 14px;
-    }
-    
-    .feat:hover .feat-icon {
-        color: var(--primary);
-        border-color: var(--primary);
-        background: rgba(94, 106, 210, 0.1);
-    }
-
-    .feat-title {
-        font-size: 15px;
-        font-weight: 500;
-        color: var(--ink);
-        margin: 0 0 8px 0;
-    }
-
-    .feat-desc {
-        font-size: 14px;
-        font-weight: 400;
-        color: var(--ink-muted);
-        line-height: 1.5;
-        margin: 0;
+    .sidebar-item:hover {
+        background: var(--surface-2) !important;
+        color: var(--primary) !important;
     }
 
     /* Footer */
@@ -298,51 +254,42 @@ components.html(
             if (parent.body.dataset.animated === "true") return;
             parent.body.dataset.animated = "true";
             
-            // Animate Hero Section
-            gsap.from(parent.querySelectorAll('.hero-kicker, .hero-title, .hero-desc'), {
-                y: 40,
-                opacity: 0,
-                duration: 1.2,
-                stagger: 0.15,
-                ease: "power4.out"
-            });
-
-            // Animate Feature Cards (Pop in with back ease)
-            gsap.from(parent.querySelectorAll('.feat'), {
-                y: 50,
-                opacity: 0,
-                scale: 0.95,
-                duration: 1.2,
-                stagger: 0.15,
-                ease: "back.out(1.2)",
-                delay: 0.3
-            });
-
-            // Animate Quick Prompt Buttons
-            gsap.from(parent.querySelectorAll('.stButton button'), {
+            // Main Canvas Empty State (Logo & H2)
+            gsap.from(parent.querySelectorAll('h2, svg'), {
                 y: 20,
                 opacity: 0,
-                duration: 0.8,
+                duration: 1,
                 stagger: 0.1,
-                ease: "power3.out",
-                delay: 0.6
+                ease: "power2.out"
+            });
+
+            // Suggested Prompt Buttons
+            gsap.from(parent.querySelectorAll('[data-testid="stMainBlockContainer"] .stButton button'), {
+                y: 15,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.05,
+                ease: "power2.out",
+                delay: 0.3
+            });
+            
+            // Sidebar Elements
+            gsap.from(parent.querySelectorAll('[data-testid="stSidebar"] *'), {
+                x: -10,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.02,
+                ease: "power2.out",
+                delay: 0.2
             });
             
             // Animate Chat Input Bar
             gsap.from(parent.querySelectorAll('.stChatInput'), {
-                y: 30,
+                y: 20,
                 opacity: 0,
                 duration: 1,
                 ease: "power3.out",
-                delay: 0.8
-            });
-            
-            // Animate Footer
-            gsap.from(parent.querySelectorAll('.ft'), {
-                opacity: 0,
-                duration: 1.5,
-                ease: "power2.out",
-                delay: 1
+                delay: 0.5
             });
             
         }, 500); 
@@ -361,65 +308,57 @@ if "memory_store" not in st.session_state:
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
-# ── Sidebar (Control Center) ──
+# ── Sidebar (ChatGPT Style) ──
 with st.sidebar:
-    st.markdown("""
-    <div style="padding: 12px 0 24px 0;">
-        <div class="hero-kicker" style="margin-bottom: 8px !important;">Agent Status: Online</div>
-        <div class="hero-title" style="font-size: 28px;">Custom AI</div>
-        <p class="hero-desc" style="font-size: 14px;">Powered by Gemini & FAISS Memory</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # "New Chat" Button
+    if st.button("➕ New Chat", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+        
+    st.markdown("<hr style='border-color: var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
     
-    st.markdown("<hr style='border-color: var(--hairline); margin: 0 0 24px 0;'>", unsafe_allow_html=True)
-
-    if st.button("✧ What do you remember?", use_container_width=True):
-        st.session_state.quick_query = "What do you remember about me from our past conversations?"
+    # Fake History / Memory Controls to look like ChatGPT Sidebar
+    st.markdown("""<div style='font-size: 12px; color: var(--ink-subtle); margin-bottom: 8px; padding-left: 8px; font-weight: 500;'>Today</div>""", unsafe_allow_html=True)
+    st.markdown("""<div style='font-size: 14px; color: var(--ink); padding: 8px; border-radius: 6px; cursor: pointer;' class='sidebar-item'>Current Conversation</div>""", unsafe_allow_html=True)
     
-    if st.button("◷ Recall Memories", use_container_width=True):
+    st.markdown("""<div style='font-size: 12px; color: var(--ink-subtle); margin-top: 24px; margin-bottom: 8px; padding-left: 8px; font-weight: 500;'>Agent Memory</div>""", unsafe_allow_html=True)
+    
+    if st.button("🧠 View Memory", use_container_width=True):
         st.session_state.quick_query = "What memories do you have stored about me? List them all."
         
-    if st.button("✎ Teach Me", use_container_width=True):
-        st.session_state.quick_query = "Teach me something interesting and useful today."
-    
-    st.markdown("<hr style='border-color: var(--hairline); margin: 24px 0;'>", unsafe_allow_html=True)
-    
-    # Feature Cards in Sidebar
-    st.markdown("""
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="feat" style="padding: 16px;">
-            <span class="feat-icon" style="width: 28px; height: 28px; margin-bottom: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
-            <p class="feat-title" style="font-size: 14px;">Chat</p>
-            <p class="feat-desc" style="font-size: 12px;">Gemini LLM powered</p>
-        </div>
-        <div class="feat" style="padding: 16px;">
-            <span class="feat-icon" style="width: 28px; height: 28px; margin-bottom: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
-            <p class="feat-title" style="font-size: 14px;">Memory</p>
-            <p class="feat-desc" style="font-size: 12px;">Persistent FAISS Vector DB</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div style="margin-top: 24px; font-size: 12px; color: var(--ink-subtle);">
-        🧠 Long-Term Memory Active
-    </div>
-    """, unsafe_allow_html=True)
+    if st.button("🗑️ Clear Memory", use_container_width=True):
+        st.session_state.memory_store.clear_memory()
+        st.success("Memory Cleared!")
 
-
-# ── Main Chat Area Header ──
+# ── Main Chat Area Header (Empty State) ──
 if not st.session_state.messages:
+    # Center container for ChatGPT empty state
     st.markdown("""
-    <div style="height: 40vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 24px;"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 7.1"></path><path d="M12 12l9.9 4.9"></path></svg>
-        <h2 style="font-weight: 600; color: var(--ink); margin:0;">How can I help you today?</h2>
-        <p style="color: var(--ink-muted); font-size: 15px; margin-top: 8px;">I can remember details across conversations.</p>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center;">
+        <div style="background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: var(--shadow-linear);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12 2.1 7.1"></path><path d="M12 12l9.9 4.9"></path></svg>
+        </div>
+        <h2 style="font-weight: 600; color: var(--ink); font-size: 32px; margin: 0 0 40px 0;">How can I help you today?</h2>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Suggested Prompts (ChatGPT style grid)
+    # Using Streamlit columns for the grid
+    st.markdown("<div style='max-width: 700px; margin: -20px auto 0 auto;'>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✧ What do you remember about me?", use_container_width=True):
+            st.session_state.quick_query = "What do you remember about me from our past conversations?"
+        if st.button("💡 Brainstorm project ideas", use_container_width=True):
+            st.session_state.quick_query = "Give me 3 unique project ideas using AI."
+    with col2:
+        if st.button("✎ Teach me something new", use_container_width=True):
+            st.session_state.quick_query = "Teach me a highly useful but uncommon mental model."
+        if st.button("🗣️ Start voice conversation", use_container_width=True):
+            st.session_state.quick_query = "I want to practice my communication skills."
+    st.markdown("</div>", unsafe_allow_html=True)
 
-
-# ── Voice Input (Placed neatly at the top of chat or in sidebar) ──
-# To keep main chat clean, we put audio in a small column if needed, but standard is fine
+# ── Voice Input ──
 audio_val = st.audio_input("Speak to the agent", label_visibility="collapsed")
 voice_query = None
 if audio_val:
