@@ -19,57 +19,274 @@ st.set_page_config(
 # ── CSS Design System (rishiware.com style) ──
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
 
     :root {
         --bg: #ffffff;
-        --text1: #111111;
+        --bg2: #f8f8f8;
+        --card: #ffffff;
+        --text: #1a1a1a;
         --text2: #555555;
-        --text3: #999999;
+        --text3: #888888;
         --border: #e0e0e0;
-        --card: #f7f7f7;
-        --accent: #111111;
+        --accent: #1a1a1a;
+        --accent-soft: rgba(0, 0, 0, 0.06);
         --success: #059669;
         --success-bg: #ecfdf5;
         --success-border: #d1fae5;
+        --radius: 16px;
+        --radius-lg: 24px;
     }
 
-    html, body, [class*="css"] {
-        font-family: 'Roboto Mono', monospace;
-        background: var(--bg);
-        color: var(--text1);
+    * {
+        font-family: 'Roboto Mono', monospace !important;
     }
 
-    .stApp {
-        max-width: 860px;
-        margin: 0 auto;
+    html, body, .stApp, [data-testid="stAppViewContainer"] {
+        background-color: var(--bg) !important;
+        color: var(--text) !important;
+        overflow-x: hidden !important;
+    }
+    
+    [data-testid="stMainBlockContainer"] {
+        padding: 1rem 1rem 2rem 1rem !important;
+        max-width: 100% !important;
     }
 
-    /* Hero */
+    #MainMenu, [data-testid="stHeader"], [data-testid="stFooter"] { 
+        display: none !important; 
+    }
+
+    /* Hide default Streamlit header anchor links (the 🔗 icon) */
+    a.header-anchor,
+    [data-testid="stMarkdownContainer"] h1 a,
+    [data-testid="stMarkdownContainer"] h2 a,
+    [data-testid="stMarkdownContainer"] h3 a,
+    [data-testid="stMarkdownContainer"] h4 a,
+    [data-testid="stMarkdownContainer"] h5 a,
+    [data-testid="stMarkdownContainer"] h6 a {
+        display: none !important;
+    }
+
+    /* Chat Messages */
+    .stChatMessage[data-testid="stChatMessage"] {
+        border-radius: var(--radius) !important;
+        padding: 20px 24px !important;
+        margin-bottom: 12px !important;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
+        background: var(--bg2) !important;
+        border: 0.8px solid var(--border) !important;
+    }
+
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
+        background: var(--bg) !important;
+        border: 0.8px solid var(--border) !important;
+    }
+
+    /* Minimalist Monochrome Chat Avatars (Replaces bright red/orange/green colors) */
+    [data-testid="stChatMessageAvatarContainer"],
+    [data-testid="stChatMessageAvatarCustom"],
+    [data-testid="chatAvatarIcon-user"],
+    [data-testid="chatAvatarIcon-assistant"] {
+        background-color: #f0f0f0 !important;
+        color: #1a1a1a !important;
+        border: 0.8px solid var(--border) !important;
+        border-radius: 8px !important;
+    }
+
+    [data-testid="chatAvatarIcon-user"] svg,
+    [data-testid="chatAvatarIcon-assistant"] svg,
+    [data-testid="stChatMessageAvatarContainer"] svg {
+        fill: #1a1a1a !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Chat Input submit button & icons */
+    [data-testid="stChatInputSubmitButton"] {
+        color: #1a1a1a !important;
+    }
+    
+    [data-testid="stChatInputSubmitButton"] svg {
+        fill: #1a1a1a !important;
+        color: #1a1a1a !important;
+    }
+
+    .stChatInput [data-testid="stIconMaterial"],
+    .stChatInput [data-testid="stChatMessageAvatarContainer"] {
+        background-color: #f0f0f0 !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Chat Input */
+    .stChatInput > div {
+        border-radius: var(--radius) !important;
+        border: 0.8px solid var(--border) !important;
+        background: var(--bg) !important;
+        transition: border-color 0.2s ease;
+    }
+
+    .stChatInput > div:focus-within {
+        border-color: var(--accent) !important;
+        box-shadow: none !important;
+    }
+
+    .stChatInput textarea {
+        color: var(--text) !important;
+        font-size: 13px !important;
+    }
+
+    .stChatInput textarea::placeholder {
+        color: var(--text3) !important;
+    }
+
+    /* Buttons */
+    .stButton > button,
+    [data-testid="stDownloadButton"] > button {
+        border-radius: 50px !important;
+        padding: 6px 14px !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        min-height: 0 !important;
+        line-height: 1.4 !important;
+        white-space: nowrap !important;
+    }
+
+    .stButton > button[data-testid="baseButton-secondary"],
+    [data-testid="stDownloadButton"] > button {
+        background-color: var(--bg) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    .stButton > button[data-testid="baseButton-secondary"]:hover,
+    [data-testid="stDownloadButton"] > button:hover {
+        border-color: var(--text) !important;
+        background-color: var(--bg2) !important;
+    }
+
+    /* Hero Section */
     .hero {
         text-align: center;
-        padding: 50px 20px 10px;
-    }
-    .hero-kicker {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        color: var(--text3);
-        margin-bottom: 12px;
-    }
-    .hero-title {
-        font-size: 2rem;
-        font-weight: 600;
-        line-height: 1.3;
-        color: var(--text1);
-        margin-bottom: 14px;
-    }
-    .hero-desc {
-        font-size: 0.85rem;
-        color: var(--text2);
-        max-width: 500px;
+        padding: 32px 24px 48px 24px;
+        max-width: 640px;
         margin: 0 auto;
+    }
+
+    .hero-kicker {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text2);
+        margin: 0 0 16px 0 !important;
+    }
+
+    .hero-title {
+        font-size: clamp(16px, 10vw, 36px);
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--text);
+        margin: 0 0 20px 0;
+        letter-spacing: -0.5px;
+        word-break: keep-all !important;
+        overflow-wrap: normal !important;
+        white-space: pre-wrap !important;
+    }
+
+    .hero-desc {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.7;
+        color: var(--text2);
+        margin: 0;
+    }
+
+    /* Feature Cards Grid */
+    .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        max-width: 720px;
+        margin: 24px auto 0 auto;
+        padding: 0 24px;
+    }
+
+    .feat {
+        background: var(--card);
+        border: 0.8px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 20px;
+        text-align: center;
+    }
+
+    .feat-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent-soft);
+        border-radius: 50px;
+        padding: 10px;
+        margin-bottom: 14px;
+        color: var(--text);
+    }
+
+    .feat-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0 0 6px 0;
+    }
+
+    .feat-desc {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--text2);
         line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Footer */
+    .ft {
+        text-align: center;
+        padding: 48px 0 24px 0;
+        font-size: 12px;
+        color: var(--text3);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ft-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+    }
+
+    .ft a {
+        color: var(--text3);
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ft a:hover { 
+        color: var(--text);
+    }
+    
+    .ft svg {
+        width: 18px;
+        height: 18px;
     }
 
     /* Memory Badge */
@@ -87,62 +304,6 @@ st.markdown("""
         margin-top: 18px;
     }
 
-    /* Feature Cards */
-    .features {
-        display: flex;
-        gap: 16px;
-        margin: 30px 0;
-        justify-content: center;
-    }
-    .feat {
-        flex: 1;
-        max-width: 220px;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px 16px;
-        text-align: center;
-    }
-    .feat-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        margin-bottom: 10px;
-        color: var(--text1);
-    }
-    .feat-title {
-        font-weight: 600;
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-    }
-    .feat-desc {
-        font-size: 0.72rem;
-        color: var(--text2);
-        line-height: 1.5;
-    }
-
-    /* Footer */
-    .footer {
-        text-align: center;
-        padding: 30px 0;
-        border-top: 1px solid var(--border);
-        margin-top: 40px;
-    }
-    .footer-text {
-        font-size: 0.78rem;
-        color: var(--text3);
-    }
-    .footer-text a { color: var(--text1); text-decoration: none; font-weight: 500; }
-    .footer-icons { margin-top: 10px; display: flex; gap: 16px; justify-content: center; }
-    .footer-icons a { color: var(--text3); text-decoration: none; transition: color 0.2s; }
-    .footer-icons a:hover { color: var(--text1); }
-
-    /* Memory Toast */
     .mem-toast {
         font-size: 0.75rem;
         color: var(--success);
@@ -153,29 +314,29 @@ st.markdown("""
         margin-top: 8px;
         display: inline-block;
     }
-
-    /* Quick Prompt Buttons */
-    .stButton > button {
-        font-family: 'Roboto Mono', monospace !important;
-        font-size: 0.78rem !important;
-        padding: 6px 14px !important;
-        border-radius: 20px !important;
-        border: 1px solid var(--border) !important;
-        background: var(--bg) !important;
-        color: var(--text1) !important;
-        transition: all 0.2s ease !important;
-    }
-    .stButton > button:hover {
-        background: var(--card) !important;
-        border-color: var(--text3) !important;
-    }
-
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
+
+# ── JS to remove '· Streamlit' suffix from title ──
+import streamlit.components.v1 as components
+components.html(
+    """
+    <script>
+        const target = window.parent.document.querySelector('title');
+        if(target) {
+            target.innerText = "Custom AI Agent";
+            const observer = new MutationObserver(() => {
+                if (target.innerText !== "Custom AI Agent") {
+                    target.innerText = "Custom AI Agent";
+                }
+            });
+            observer.observe(target, { childList: true, characterData: true, subtree: true });
+        }
+    </script>
+    """,
+    height=0,
+    width=0,
+)
 
 
 # ── Initialize State ──
@@ -350,16 +511,16 @@ if query:
 
 # ── Footer ──
 st.markdown("""
-<div class="footer">
-    <p class="footer-text">Built by <a href="https://rishiware.com" target="_blank">Rishikesan</a></p>
-    <div class="footer-icons">
-        <a href="https://rishiware.com" target="_blank">
+<div class="ft">
+    <div class="ft-text">Built by <a href="https://rishiware.com" target="_blank">Rishikesan</a></div>
+    <div class="ft-links">
+        <a href="https://rishiware.com" target="_blank" title="Website">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         </a>
-        <a href="https://linkedin.com/in/rishikesan05" target="_blank">
+        <a href="https://linkedin.com/in/rishikesan05" target="_blank" title="LinkedIn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </a>
-        <a href="https://github.com/Rishikesan05" target="_blank">
+        <a href="https://github.com/Rishikesan05" target="_blank" title="GitHub">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         </a>
     </div>
