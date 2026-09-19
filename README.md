@@ -1,138 +1,105 @@
-# Custom AI Agent with Memory
+# Custom AI Agent with Long-Term Memory
 
-A voice and text-based intelligent assistant with long-term memory capabilities, leveraging vector databases to recall past interactions and maintain personalized context across sessions.
+A conversational AI assistant that **remembers you** across sessions. Unlike standard chatbots that forget everything when you close the tab, this agent stores important facts about you using vector-based semantic memory and recalls them in future conversations.
 
-## Features
+## What Makes This Different
 
-- **Long-Term Memory**: Saves and recalls important information from past conversations using a persistent memory store
-- **ReAct Architecture**: Uses a reasoning + acting loop for intelligent decision-making
-- **User-Scoped Memory**: Memories are scoped per user, enabling personalized interactions
-- **Voice Support**: Integrates with OpenAI Whisper for speech-to-text input
-- **Configurable Models**: Supports multiple LLM providers (OpenAI, Anthropic Claude)
-- **LangGraph Powered**: Built on LangGraph for robust state management and workflow orchestration
+| Feature | Standard Chatbot | This Agent |
+|---------|-----------------|------------|
+| Memory | Forgets after session | Remembers across sessions |
+| Context | Only current chat | Past conversations + current |
+| Personalization | None | Learns your preferences |
+| Voice Input | Rarely supported | Built-in speech recognition |
+
+## How It Works
+
+```
+You speak or type
+       │
+       ▼
+┌──────────────┐     ┌─────────────────┐
+│   Gemini AI  │◄────│  FAISS Memory   │
+│  (Generate)  │     │  (Recall past   │
+│              │     │   interactions) │
+└──────┬───────┘     └─────────────────┘
+       │                      ▲
+       ▼                      │
+  AI Response ────────► Extract & Save
+  (personalized)        new memories
+```
+
+**Memory Flow:**
+1. You ask a question
+2. Agent searches FAISS vector store for relevant past memories
+3. Relevant memories are injected into the AI prompt as context
+4. Gemini generates a personalized response
+5. Agent automatically extracts new facts about you and saves them
 
 ## Tech Stack
 
-- **Backend**: Python, LangChain, LangGraph
-- **AI**: OpenAI GPT-4, Anthropic Claude, Whisper
-- **Memory**: Redis / ChromaDB (vector store)
-- **Frontend**: Streamlit / Next.js
-- **Testing**: pytest
-
-## Architecture
-
-```
-User Input (Text/Voice)
-       │
-       ▼
-┌──────────────┐
-│  LangGraph   │
-│  ReAct Agent │
-│              │
-│  ┌────────┐  │    ┌─────────────┐
-│  │ Reason │──┼───>│ Memory Tool │
-│  │  +Act  │  │    │  (Save/     │
-│  └────────┘  │    │   Recall)   │
-│              │    └─────────────┘
-└──────┬───────┘
-       │
-       ▼
-  AI Response
-(with context from
- past conversations)
-```
+| Technology | Purpose |
+|-----------|---------|
+| **Python** | Core language |
+| **Streamlit** | Web UI framework |
+| **Google Gemini 3.5 Flash** | LLM for conversation |
+| **FAISS** (Facebook AI Similarity Search) | Vector database for memory |
+| **Google Gemini Embedding** | Text → vector conversion |
+| **LangChain** | LLM orchestration framework |
+| **SpeechRecognition** | Voice → text conversion |
 
 ## Getting Started
 
 ### Prerequisites
-
-- Python 3.11+
-- OpenAI API key (or Anthropic API key)
+- Python 3.10+
+- Google API Key ([Get one free](https://aistudio.google.com/apikey))
 
 ### Installation
-
-1. Clone the repository:
 
 ```bash
 git clone https://github.com/Rishikesan05/Custom-AI-Agent.git
 cd Custom-AI-Agent
+pip install -r requirements.txt
 ```
 
-2. Set up the environment:
+### Configuration
 
 ```bash
 cp .env.example .env
+# Edit .env and add your Google API Key
 ```
 
-3. Add your API keys to `.env`:
-
-```
-OPENAI_API_KEY=your-openai-api-key
-# OR
-ANTHROPIC_API_KEY=your-anthropic-api-key
-```
-
-4. Install dependencies:
+### Run
 
 ```bash
-pip install -e .
-# OR using uv:
-uv sync
+streamlit run app.py
 ```
-
-### Running the Agent
-
-```bash
-python -m memory_agent
-```
-
-Or via LangGraph Studio for a visual interface.
-
-## Configuration
-
-The default model can be configured in `langgraph.json`:
-
-```yaml
-model: anthropic/claude-3-5-sonnet-20240620
-```
-
-You can change this to any supported model (e.g., `openai/gpt-4`, `openai/gpt-4o`).
 
 ## Project Structure
 
 ```
-├── src/
-│   └── memory_agent/
-│       ├── __init__.py       # Package initialization
-│       ├── graph.py          # LangGraph agent definition
-│       ├── state.py          # Agent state management
-│       ├── tools.py          # Memory save/recall tools
-│       ├── prompts.py        # System prompts
-│       ├── context.py        # Context management
-│       └── utils.py          # Utility functions
-├── tests/
-│   ├── unit_tests/           # Unit tests
-│   └── integration_tests/    # Integration tests
-├── static/                   # Documentation images
-├── langgraph.json            # LangGraph configuration
-├── pyproject.toml            # Python project config
-└── .env.example              # Environment template
+Custom-AI-Agent/
+├── app.py              # Main Streamlit application (UI + chat logic)
+├── memory.py           # FAISS-based long-term memory store
+├── requirements.txt    # Python dependencies
+├── .env.example        # Environment variable template
+├── .gitignore          # Git ignore rules
+└── README.md           # This file
 ```
 
-## Testing
+## Features
 
-```bash
-# Run unit tests
-make test
+- **🧠 Long-Term Memory** — Automatically extracts and stores facts about users
+- **🔍 Semantic Recall** — Uses vector similarity to find relevant past memories
+- **🎙️ Voice Input** — Speak to the agent using your microphone
+- **⚡ Streaming Responses** — Real-time token-by-token response display
+- **📥 Export Chat** — Download conversation as clean, human-readable text
+- **🗑️ Clear Chat** — Reset conversation with one click
+- **⚠️ Error Handling** — Graceful handling of rate limits and API errors
 
-# Run integration tests
-make integration_test
-```
+## License
 
-## How Memory Works
+MIT
 
-The agent uses a simple but effective memory system:
+## Author
 
-1. **Save Memory**: When the agent identifies important information (preferences, facts, context), it saves it to a vector store scoped to the user
-2. **Recall Memory**: Before responding, the agent searches its memory for relevant past interactions
-3. **Context Enrichment**: Retrieved memories are injected into the conversation context, enabling personalized responses
+Built by [Rishikesan](https://rishiware.com)
