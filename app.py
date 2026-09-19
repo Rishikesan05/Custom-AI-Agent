@@ -16,38 +16,42 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ── CSS Design System (Sleek & Premium) ──
+# ── CSS Design System (Midnight Glassmorphism) ──
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
     :root {
-        --bg: #f8fafc;
-        --card: #ffffff;
-        --text: #0f172a;
-        --text2: #475569;
-        --text3: #94a3b8;
-        --border: #e2e8f0;
-        --accent: #3b82f6;
-        --accent-soft: #eff6ff;
+        --bg: #09090b;
+        --card: rgba(24, 24, 27, 0.6);
+        --card-hover: rgba(39, 39, 42, 0.8);
+        --text: #ffffff;
+        --text2: #a1a1aa;
+        --text3: #52525b;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-glow: rgba(139, 92, 246, 0.3);
+        --accent: #8b5cf6;
+        --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
         --success: #10b981;
-        --success-bg: #ecfdf5;
-        --success-border: #a7f3d0;
+        --success-bg: rgba(16, 185, 129, 0.1);
+        --success-border: rgba(16, 185, 129, 0.2);
         --radius: 16px;
         --radius-lg: 24px;
-        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-        --shadow-float: 0 20px 40px -10px rgba(0,0,0,0.08);
+        --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
     }
 
     * {
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Outfit', sans-serif !important;
     }
 
     html, body, .stApp, [data-testid="stAppViewContainer"] {
         background-color: var(--bg) !important;
         color: var(--text) !important;
         overflow-x: hidden !important;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+        background-attachment: fixed;
     }
     
     [data-testid="stMainBlockContainer"] {
@@ -68,20 +72,23 @@ st.markdown("""
         border-radius: var(--radius) !important;
         padding: 20px 24px !important;
         margin-bottom: 16px !important;
-        font-size: 14px;
-        line-height: 1.6;
-        border: none !important;
+        font-size: 14.5px;
+        line-height: 1.7;
+        border: 1px solid transparent !important;
+        backdrop-filter: blur(10px);
     }
 
     /* User Message (Inset/Flat) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
-        background: #f1f5f9 !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
     }
 
-    /* AI Message (Floating Card) */
+    /* AI Message (Glowing Card) */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
         background: var(--card) !important;
-        box-shadow: var(--shadow-sm) !important;
+        border-color: var(--border) !important;
+        box-shadow: 0 4px 24px -1px rgba(0,0,0,0.2) !important;
     }
 
     /* Chat Input submit button & icons */
@@ -98,16 +105,15 @@ st.markdown("""
     .stChatInput > div {
         border-radius: 20px !important;
         border: 1px solid var(--border) !important;
-        background: var(--card) !important;
-        box-shadow: var(--shadow-md) !important;
+        background: rgba(9, 9, 11, 0.8) !important;
+        backdrop-filter: blur(12px) !important;
         transition: all 0.3s ease;
-        padding: 4px 8px !important;
+        padding: 6px 10px !important;
     }
 
     .stChatInput > div:focus-within {
-        border-color: var(--accent) !important;
-        box-shadow: var(--shadow-float) !important;
-        transform: translateY(-2px);
+        border-color: var(--border-glow) !important;
+        box-shadow: var(--shadow-glow) !important;
     }
 
     .stChatInput textarea {
@@ -123,57 +129,61 @@ st.markdown("""
     .stButton > button,
     [data-testid="stDownloadButton"] > button {
         border-radius: 50px !important;
-        padding: 8px 18px !important;
+        padding: 8px 20px !important;
         font-weight: 500 !important;
-        font-size: 13px !important;
-        transition: all 0.2s ease;
+        font-size: 13.5px !important;
+        transition: all 0.3s ease;
         cursor: pointer;
-        background-color: var(--card) !important;
+        background: rgba(255, 255, 255, 0.03) !important;
         color: var(--text2) !important;
         border: 1px solid var(--border) !important;
-        box-shadow: var(--shadow-sm) !important;
+        backdrop-filter: blur(8px);
     }
 
     .stButton > button:hover,
     [data-testid="stDownloadButton"] > button:hover {
         border-color: var(--accent) !important;
-        color: var(--accent) !important;
+        color: #ffffff !important;
+        background: rgba(139, 92, 246, 0.1) !important;
+        box-shadow: var(--shadow-glow) !important;
         transform: translateY(-1px);
-        box-shadow: var(--shadow-md) !important;
     }
 
     /* Hero Section */
     .hero {
         text-align: center;
-        padding: 40px 24px 48px 24px;
-        max-width: 640px;
+        padding: 60px 24px 48px 24px;
+        max-width: 680px;
         margin: 0 auto;
     }
 
     .hero-kicker {
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 2px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 3px;
         text-transform: uppercase;
-        color: var(--accent);
+        color: #ffffff;
         margin: 0 0 16px 0 !important;
-        background: var(--accent-soft);
+        background: var(--accent-gradient);
         display: inline-block;
-        padding: 4px 12px;
+        padding: 6px 16px;
         border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
     }
 
     .hero-title {
-        font-size: clamp(24px, 5vw, 42px);
+        font-size: clamp(32px, 6vw, 48px);
         font-weight: 800;
-        line-height: 1.2;
-        color: var(--text);
+        line-height: 1.1;
         margin: 0 0 20px 0;
-        letter-spacing: -1px;
+        letter-spacing: -1.5px;
+        background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .hero-desc {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 400;
         line-height: 1.7;
         color: var(--text2);
@@ -192,40 +202,51 @@ st.markdown("""
 
     .feat {
         background: var(--card);
-        border: 1px solid rgba(255,255,255,0.5);
+        border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        padding: 28px 20px;
+        padding: 32px 20px;
         text-align: center;
-        box-shadow: var(--shadow-md);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(12px);
+        transition: all 0.3s ease;
     }
 
     .feat:hover {
         transform: translateY(-5px);
-        box-shadow: var(--shadow-float);
+        background: var(--card-hover);
+        border-color: var(--border-glow);
+        box-shadow: var(--shadow-glow);
     }
 
     .feat-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: var(--accent-soft);
-        border-radius: 14px;
-        width: 48px;
-        height: 48px;
-        margin-bottom: 16px;
-        color: var(--accent);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        width: 52px;
+        height: 52px;
+        margin-bottom: 20px;
+        color: #ffffff;
+        font-size: 1.2rem;
+    }
+    
+    .feat:hover .feat-icon {
+        background: var(--accent-gradient);
+        border-color: transparent;
+        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
     }
 
     .feat-title {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
-        color: var(--text);
+        color: #ffffff;
         margin: 0 0 8px 0;
+        letter-spacing: -0.2px;
     }
 
     .feat-desc {
-        font-size: 13px;
+        font-size: 13.5px;
         font-weight: 400;
         color: var(--text2);
         line-height: 1.6;
@@ -235,12 +256,12 @@ st.markdown("""
     /* Footer */
     .ft {
         text-align: center;
-        padding: 60px 0 24px 0;
+        padding: 60px 0 32px 0;
         font-size: 13px;
         color: var(--text3);
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 16px;
     }
 
     .ft-links {
@@ -253,11 +274,18 @@ st.markdown("""
     .ft a {
         color: var(--text3);
         text-decoration: none;
-        transition: color 0.2s ease;
+        transition: all 0.2s ease;
+        padding: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid transparent;
     }
 
     .ft a:hover { 
-        color: var(--text);
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border);
+        transform: translateY(-2px);
     }
 
     /* Memory Badge */
@@ -270,7 +298,7 @@ st.markdown("""
         border: 1px solid var(--success-border);
         margin-top: 12px;
         display: inline-block;
-        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(8px);
     }
 </style>
 """, unsafe_allow_html=True)
