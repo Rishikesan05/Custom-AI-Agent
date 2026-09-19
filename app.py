@@ -77,34 +77,14 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    .stChatMessage[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]),
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
         background: var(--bg2) !important;
         border: 0.8px solid var(--border) !important;
     }
 
-    .stChatMessage[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]),
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
         background: var(--bg) !important;
         border: 0.8px solid var(--border) !important;
-    }
-
-    /* Minimalist Monochrome Chat Avatars (Replaces bright red/orange/green colors) */
-    [data-testid="stChatMessageAvatarContainer"],
-    [data-testid="stChatMessageAvatarCustom"],
-    [data-testid="chatAvatarIcon-user"],
-    [data-testid="chatAvatarIcon-assistant"] {
-        background-color: #f0f0f0 !important;
-        color: #1a1a1a !important;
-        border: 0.8px solid var(--border) !important;
-        border-radius: 8px !important;
-    }
-
-    [data-testid="chatAvatarIcon-user"] svg,
-    [data-testid="chatAvatarIcon-assistant"] svg,
-    [data-testid="stChatMessageAvatarContainer"] svg {
-        fill: #1a1a1a !important;
-        color: #1a1a1a !important;
     }
 
     /* Chat Input submit button & icons */
@@ -423,7 +403,8 @@ if audio_val:
 
 # ── Chat Display ──
 for msg in st.session_state.messages:
-    with st.chat_message(msg.type):
+    avatar = "🧑‍💻" if msg.type == "human" else "🤖"
+    with st.chat_message(msg.type, avatar=avatar):
         st.markdown(msg.content)
 
 # ── Chat Input ──
@@ -437,10 +418,10 @@ query = voice_query if voice_query else user_query
 
 if query:
     st.session_state.messages.append(HumanMessage(content=query))
-    with st.chat_message("human"):
+    with st.chat_message("human", avatar="🧑‍💻"):
         st.markdown(query)
 
-    with st.chat_message("ai"):
+    with st.chat_message("ai", avatar="🤖"):
         start_time = time.time()
 
         # 1. Recall relevant memories
