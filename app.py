@@ -282,6 +282,32 @@ st.markdown("""
         gap: 0.5rem;
     }
     
+    /* Sidebar Section Headers (Conversations & Memory Vault) */
+    .sidebar-section-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin: 14px 0 16px 0 !important;
+    }
+    .sidebar-section-header .section-badge {
+        background: var(--surface-3);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink);
+        padding: 0 7px;
+        border-radius: 9999px;
+        min-width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        line-height: 1;
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] div[style*="justify-content: space-between"] {
+        margin-bottom: 16px !important;
+    }
+    
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         [data-testid="stMainBlockContainer"] {
@@ -1413,9 +1439,9 @@ with st.sidebar:
     total_chats = len(saved_chats)
 
     st.markdown(f"""
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 12px 0 6px 0;">
+    <div class="sidebar-section-header" style="display: flex; align-items: center; justify-content: space-between; margin: 14px 0 16px 0;">
         <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">Conversations</span>
-        <span style="background: var(--surface-3); font-size: 11px; font-weight: 600; color: var(--ink); padding: 2px 8px; border-radius: 9999px;">{total_chats}</span>
+        <span class="section-badge" style="background: var(--surface-3); font-size: 11px; font-weight: 600; color: var(--ink); padding: 0 7px; border-radius: 9999px; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; line-height: 1;">{total_chats}</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1459,9 +1485,9 @@ with st.sidebar:
     mem_count = len(memories)
 
     st.markdown(f"""
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+    <div class="sidebar-section-header" style="display: flex; align-items: center; justify-content: space-between; margin: 14px 0 14px 0;">
         <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">Memory Vault</span>
-        <span style="background: var(--surface-3); font-size: 11px; font-weight: 600; color: var(--ink); padding: 2px 8px; border-radius: 9999px;">{mem_count} facts</span>
+        <span class="section-badge" style="background: var(--surface-3); font-size: 11px; font-weight: 600; color: var(--ink); padding: 0 8px; border-radius: 9999px; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; line-height: 1;">{mem_count} facts</span>
     </div>
     """, unsafe_allow_html=True)
 
