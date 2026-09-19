@@ -632,19 +632,19 @@ st.markdown("""
         line-height: 1.65 !important;
     }
 
-    /* Clean Chat Message Action Buttons (Retry, etc.) */
+    /* Clean Monochrome Grayscale Action Buttons (Retry, etc.) */
     .stChatMessage .stButton button {
         border-radius: var(--radius-pill) !important;
         font-size: 12.5px !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
         padding: 4px 14px !important;
-        min-height: 32px !important;
-        height: 32px !important;
+        min-height: 30px !important;
+        height: 30px !important;
         border: 1px solid var(--hairline) !important;
         background: var(--surface-1) !important;
         color: var(--ink) !important;
         box-shadow: var(--shadow-subtle) !important;
-        transition: all 0.15s ease !important;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
         display: inline-flex !important;
         align-items: center !important;
         gap: 6px !important;
@@ -653,7 +653,26 @@ st.markdown("""
     .stChatMessage .stButton button:hover {
         background: var(--surface-3) !important;
         border-color: var(--ink-subtle) !important;
+        color: var(--ink) !important;
         transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    }
+    .stChatMessage .stButton button:active {
+        transform: translateY(0) !important;
+    }
+    /* Grayscale SVG Icon Mask for Retry Button */
+    .stChatMessage .stButton button [data-testid="stIconMaterial"] {
+        display: inline-block !important;
+        width: 14px !important;
+        height: 14px !important;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3Cpath d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'/%3E%3Cpath d='M8 16H3v5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3Cpath d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'/%3E%3Cpath d='M8 16H3v5'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        background-color: currentColor !important;
+        font-size: 0 !important;
+        color: var(--ink-muted) !important;
+    }
+    .stChatMessage .stButton button:hover [data-testid="stIconMaterial"] {
+        color: var(--ink) !important;
     }
 
     /* Suggestion Grid */
@@ -1555,7 +1574,7 @@ for idx, msg in enumerate(st.session_state.messages):
                 # Dedicated prominent Retry button
                 col_btn, _ = st.columns([2, 8])
                 with col_btn:
-                    if st.button("🔄 Retry", key=f"retry_err_{idx}", help="Click to retry generating this response"):
+                    if st.button("Retry", icon=":material/refresh:", key=f"retry_err_{idx}", help="Click to retry generating this response"):
                         active_chat = st.session_state.chats[st.session_state.active_chat_id]
                         # Remove error AI message and preceding human message if matched
                         new_msgs = []
@@ -1607,7 +1626,7 @@ for idx, msg in enumerate(st.session_state.messages):
                         if idx > 0 and st.session_state.messages[idx - 1].type == "human":
                             prec_q = st.session_state.messages[idx - 1].content
                         if prec_q:
-                            if st.button("🔄 Retry", key="retry_last_resp", help="Regenerate this response"):
+                            if st.button("Retry", icon=":material/refresh:", key="retry_last_resp", help="Regenerate this response"):
                                 active_chat = st.session_state.chats[st.session_state.active_chat_id]
                                 active_chat["messages"] = active_chat["messages"][:-2]
                                 st.session_state.messages = active_chat["messages"]
@@ -1629,7 +1648,7 @@ if st.session_state.messages and st.session_state.messages[-1].type == "human" a
         st.error("**Rate Limit Exceeded or Interrupted:** Previous response could not be generated. Please wait a moment and click **Retry** below.")
         col_r, _ = st.columns([2, 8])
         with col_r:
-            if st.button("🔄 Retry", key="retry_unanswered_btn", help="Retry sending this message"):
+            if st.button("Retry", icon=":material/refresh:", key="retry_unanswered_btn", help="Retry sending this message"):
                 active_chat = st.session_state.chats[st.session_state.active_chat_id]
                 active_chat["messages"].pop()
                 st.session_state.messages = active_chat["messages"]
