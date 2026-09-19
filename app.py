@@ -232,8 +232,9 @@ st.markdown("""
         background: transparent !important;
         z-index: 99 !important;
     }
-    [data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stHeaderActionElements"], [data-testid="stToolbarActions"], #MainMenu, [data-testid="stFooter"] { 
+    [data-testid="stDeployButton"], .stDeployButton, .stAppDeployButton, [data-testid="stHeaderActionElements"], [data-testid="stToolbarActions"], [data-testid="stStatusWidget"], .stStatusWidget, #MainMenu, [data-testid="stFooter"] { 
         display: none !important; 
+        visibility: hidden !important;
     }
 
     /* Sidebar Expand Button (When Sidebar is Collapsed) */
