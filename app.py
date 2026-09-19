@@ -310,9 +310,9 @@ st.markdown("""
     .stChatInput > div {
         position: fixed !important;
         bottom: 22px !important;
-        left: calc(50% - 322px) !important;
-        width: 490px !important;
-        max-width: 490px !important;
+        left: calc(50% - 262px) !important;
+        width: 524px !important;
+        max-width: 524px !important;
         height: 46px !important;
         min-height: 46px !important;
         margin: 0 !important;
@@ -349,53 +349,114 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* 3. Voice Recorder Pill */
+    /* 3. Voice Recorder: Circular icon when idle, expands into full controls on click */
     [data-testid="stAudioInput"] {
         position: fixed !important;
         bottom: 22px !important;
-        left: calc(50% + 178px) !important;
+        left: calc(50% + 274px) !important;
         transform: none !important;
-        width: 200px !important;
-        max-width: 200px !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
         height: 46px !important;
         min-height: 46px !important;
         z-index: 1000 !important;
         background: var(--surface-1) !important;
         border: 1px solid var(--hairline) !important;
-        border-radius: var(--radius-pill) !important;
+        border-radius: 50% !important;
         box-shadow: var(--shadow-floating) !important;
-        padding: 0 12px !important;
+        padding: 0 !important;
         display: flex !important;
         align-items: center !important;
+        justify-content: center !important;
         box-sizing: border-box !important;
+        cursor: pointer !important;
+        overflow: hidden !important;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.25s ease, box-shadow 0.25s ease !important;
     }
     
+    [data-testid="stAudioInput"]:hover {
+        border-color: var(--ink-subtle) !important;
+        transform: scale(1.05);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1) !important;
+    }
+
     [data-testid="stAudioInput"] > div {
         border: none !important;
         background: transparent !important;
         width: 100% !important;
+        height: 100% !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: space-between !important;
+        justify-content: center !important;
+        padding: 0 !important;
     }
 
-    /* When sidebar is expanded on desktop, dynamically offset the unified bottom dock to center inside the main chat area */
+    [data-testid="stAudioInputActionButton"] {
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        min-height: 46px !important;
+        border: none !important;
+        background: transparent !important;
+        border-radius: 50% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+    }
+
+    /* Idle state: hide timeline and timecode so only the mic icon shows */
+    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) [data-testid="stAudioInputWaveSurfer"],
+    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) [data-testid="stAudioInputWaveformTimeCode"],
+    [data-testid="stAudioInput"]:not(:has(button[aria-label*="Stop"])):not(:has(button[aria-label*="Pause"])):not(:has(button[aria-label*="Resume"])):not(:has(audio)) div:has(> [data-testid="stAudioInputWaveSurfer"]) {
+        display: none !important;
+    }
+
+    /* Recording / Active state: smooth expansion into recording control bar */
+    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]),
+    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]),
+    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]),
+    [data-testid="stAudioInput"]:has(audio) {
+        width: 260px !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        border-radius: var(--radius-pill) !important;
+        padding: 0 12px !important;
+        justify-content: space-between !important;
+        transform: none !important;
+    }
+
+    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]) [data-testid="stAudioInputWaveSurfer"],
+    [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]) [data-testid="stAudioInputWaveformTimeCode"],
+    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]) [data-testid="stAudioInputWaveSurfer"],
+    [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]) [data-testid="stAudioInputWaveformTimeCode"],
+    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]) [data-testid="stAudioInputWaveSurfer"],
+    [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]) [data-testid="stAudioInputWaveformTimeCode"],
+    [data-testid="stAudioInput"]:has(audio) [data-testid="stAudioInputWaveSurfer"],
+    [data-testid="stAudioInput"]:has(audio) [data-testid="stAudioInputWaveformTimeCode"] {
+        display: flex !important;
+    }
+
+    /* When sidebar is expanded on desktop, dynamically offset the unified bottom dock */
     @media (min-width: 821px) {
         [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stColumn"]:has(.action-btn-left) {
-            left: calc(50% + 150px - 378px) !important;
+            left: calc(50% + 150px - 320px) !important;
         }
         [data-testid="stSidebar"][aria-expanded="true"] ~ * .stChatInput > div {
-            left: calc(50% + 150px - 322px) !important;
+            left: calc(50% + 150px - 262px) !important;
         }
         [data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stAudioInput"] {
-            left: calc(50% + 150px + 178px) !important;
+            left: calc(50% + 150px + 274px) !important;
         }
     }
 
-    /* Responsive Mobile Layout: Keep everything on ONE LINE */
+    /* Responsive Mobile Layout */
     @media (max-width: 820px) {
         [data-testid="stColumn"]:has(.action-btn-left) {
-            left: 10px !important;
+            left: 12px !important;
             bottom: 16px !important;
             width: 40px !important;
             min-width: 40px !important;
@@ -407,27 +468,110 @@ st.markdown("""
             min-height: 40px !important;
         }
         .stChatInput > div {
-            left: 56px !important;
-            width: calc(100% - 212px) !important;
-            max-width: calc(100% - 212px) !important;
+            left: 58px !important;
+            width: calc(100% - 114px) !important;
+            max-width: calc(100% - 114px) !important;
             bottom: 16px !important;
             height: 40px !important;
             min-height: 40px !important;
         }
         [data-testid="stAudioInput"] {
             left: auto !important;
-            right: 10px !important;
-            width: 140px !important;
-            max-width: 140px !important;
+            right: 12px !important;
+            width: 40px !important;
+            min-width: 40px !important;
+            max-width: 40px !important;
             bottom: 16px !important;
             height: 40px !important;
             min-height: 40px !important;
-            padding: 0 8px !important;
+            padding: 0 !important;
+        }
+        [data-testid="stAudioInput"]:has(button[aria-label*="Stop"]),
+        [data-testid="stAudioInput"]:has(button[aria-label*="Pause"]),
+        [data-testid="stAudioInput"]:has(button[aria-label*="Resume"]),
+        [data-testid="stAudioInput"]:has(audio) {
+            width: 220px !important;
+            min-width: 220px !important;
+            max-width: 220px !important;
+            right: 12px !important;
         }
     }
 
     /* Base styling for circular floating '+' action button */
+    [data-testid="stColumn"]:has(.action-btn-left) {
+        position: fixed !important;
+        bottom: 22px !important;
+        left: calc(50% - 320px) !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        z-index: 1000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button {
+        border-radius: 50% !important;
+        width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        min-width: 46px !important;
+        padding: 0 !important;
+        background: var(--surface-1) !important;
+        box-shadow: var(--shadow-floating) !important;
+        border: 1px solid var(--hairline) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button:hover {
+        border-color: var(--ink-subtle) !important;
+        transform: scale(1.05);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Hide the second icon (chevron expand_more) inside popover button */
+    [data-testid="stColumn"]:has(.action-btn-left) button div[aria-hidden="true"] {
+        display: none !important;
+    }
+
+    /* SVG Icon Replacements for Buttons */
+    [data-testid="stSidebar"] button[data-testid*="chat_nav_"] [data-testid="stIconMaterial"] {
+        display: inline-block !important;
+        width: 18px !important;
+        height: 18px !important;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        background-color: currentColor !important;
+        font-size: 0 !important;
+    }
+
+    [data-testid="stSidebar"] button[data-testid*="chat_del_"] [data-testid="stIconMaterial"] {
+        display: inline-block !important;
+        width: 16px !important;
+        height: 16px !important;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'/%3E%3Cpath d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'/%3E%3Cpath d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        background-color: currentColor !important;
+        font-size: 0 !important;
+    }
+
+    [data-testid="stSidebar"] button[data-testid*="new_chat_btn"] [data-testid="stIconMaterial"],
+    [data-testid="stColumn"]:has(.action-btn-left) [data-testid="stPopover"] button [data-testid="stIconMaterial"] {
+        display: inline-block !important;
+        width: 20px !important;
+        height: 20px !important;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") no-repeat center / contain !important;
+        background-color: currentColor !important;
+        font-size: 0 !important;
+    }
+
         border-radius: 50% !important;
         width: 46px !important;
         height: 46px !important;
@@ -470,46 +614,68 @@ st.markdown("""
         min-width: 200px !important;
     }
 
+    /* Clean, harmonized Chat Container & Message Alignment */
     .stChatMessage[data-testid="stChatMessage"] {
         border-radius: var(--radius-lg) !important;
-        padding: 16px 24px !important;
         margin-bottom: 24px !important;
-        font-size: 15.5px;
-        line-height: 1.6;
+        font-size: 15.5px !important;
+        line-height: 1.6 !important;
         border: none !important;
-        background: transparent !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 14px !important;
     }
 
+    /* User Message: Clean right-aligned floating bubble */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="human"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="user"]) {
         background: var(--surface-2) !important;
+        border: 1px solid var(--hairline) !important;
         color: var(--ink) !important;
-        margin-left: auto;
-        border-radius: 24px 24px 6px 24px !important;
-        max-width: 85%;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        border-radius: 20px 20px 6px 20px !important;
+        max-width: 80% !important;
+        padding: 14px 20px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     }
 
+    /* Assistant Message: Clean left-aligned layout matching user text */
     .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="assistant"]),
     .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="ai"]) {
-        background: var(--surface-1) !important;
-        margin-right: auto;
-        max-width: 95%;
-        padding-left: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        max-width: 95% !important;
+        padding: 8px 0 !important;
     }
     
     [data-testid="stChatMessage"] [data-testid="stChatAvatar"],
     [data-testid="stChatMessage"] [data-testid*="stChatMessageAvatar"] {
         background: transparent !important;
         border-radius: 10px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
     }
 
     [data-testid="stChatMessage"] img {
         border-radius: 10px !important;
         width: 36px !important;
         height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
         object-fit: contain !important;
+        display: block !important;
+    }
+
+    [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+        color: var(--ink) !important;
+        font-size: 15px !important;
+        line-height: 1.65 !important;
     }
 
 
@@ -804,12 +970,27 @@ with st.sidebar:
         sorted_chats = sorted(st.session_state.chats.items(), key=lambda x: x[1].get("created_at", 0), reverse=True)
         for c_id, c_data in sorted_chats:
             is_active = (c_id == st.session_state.active_chat_id)
+            
+            # Automatically resolve real conversation title from first human message
+            title_text = c_data.get("title", "New Chat")
+            if (title_text == "New Chat" or not title_text) and c_data.get("messages"):
+                for m in c_data["messages"]:
+                    if m.type == "human" and m.content:
+                        clean_t = clean_display_text(m.content).strip()
+                        words = clean_t.split()
+                        short_t = " ".join(words[:4])
+                        if len(words) > 4 or len(clean_t) > 22:
+                            short_t = short_t[:20].rstrip() + "..."
+                        if short_t:
+                            title_text = short_t
+                            c_data["title"] = short_t
+                        break
+
+            display_label = title_text[:18] + "..." if len(title_text) > 20 else title_text
+            icon = ":material/chat_bubble:" if is_active else ":material/chat_bubble_outline:"
+            btn_type = "primary" if is_active else "secondary"
             c_col1, c_col2 = st.columns([5, 1])
             with c_col1:
-                title_text = c_data.get("title", "New Chat")
-                display_label = title_text[:18] + "..." if len(title_text) > 20 else title_text
-                icon = ":material/chat_bubble:" if is_active else ":material/chat_bubble_outline:"
-                btn_type = "primary" if is_active else "secondary"
                 if st.button(display_label, key=f"chat_nav_{c_id}", icon=icon, use_container_width=True, type=btn_type, help=title_text):
                     st.session_state.active_chat_id = c_id
                     st.rerun()
@@ -1150,6 +1331,7 @@ if query:
                 <span style="color: var(--ink-subtle);">Long-Term Vector Context Active</span>
             </div>
             """, unsafe_allow_html=True)
+            st.rerun()
 
         except Exception as e:
             error_msg = str(e)
