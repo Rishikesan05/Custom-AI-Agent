@@ -492,6 +492,74 @@ if query:
                 st.error("**Rate Limit Exceeded:** Please wait 30 seconds and try again.")
             else:
                 st.error(f"**Error:** {error_msg}")
-    </div>
-</div>
-""", unsafe_allow_html=True)
+
+# ── JS & GSAP Animations ──
+import streamlit.components.v1 as components
+components.html(
+    """
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // 1. Rename Streamlit Title
+        const target = window.parent.document.querySelector('title');
+        if(target) {
+            target.innerText = "Custom AI Agent";
+            const observer = new MutationObserver(() => {
+                if (target.innerText !== "Custom AI Agent") {
+                    target.innerText = "Custom AI Agent";
+                }
+            });
+            observer.observe(target, { childList: true, characterData: true, subtree: true });
+        }
+
+        // 2. GSAP Stunning Entry Animations
+        setTimeout(() => {
+            const parent = window.parent.document;
+            
+            // Prevent re-animating if already animated (st.rerun triggers this script again)
+            if (parent.body.dataset.animated === "true") return;
+            parent.body.dataset.animated = "true";
+            
+            // Main Canvas Empty State (Logo & H2)
+            gsap.from(parent.querySelectorAll('h2, svg'), {
+                y: 20,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+
+            // Suggested Prompt Buttons
+            gsap.from(parent.querySelectorAll('[data-testid="stMainBlockContainer"] .stButton button'), {
+                y: 15,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.05,
+                ease: "power2.out",
+                delay: 0.3
+            });
+            
+            // Sidebar Elements
+            gsap.from(parent.querySelectorAll('[data-testid="stSidebar"] *'), {
+                x: -10,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.02,
+                ease: "power2.out",
+                delay: 0.2
+            });
+            
+            // Animate Chat Input Bar
+            gsap.from(parent.querySelectorAll('.stChatInput'), {
+                y: 20,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                delay: 0.5
+            });
+            
+        }, 500); 
+    </script>
+    """,
+    height=0,
+    width=0,
+)
