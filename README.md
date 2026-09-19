@@ -35,7 +35,7 @@ You speak or type
 1. User sends a question (text or voice)
 2. Agent searches FAISS vector store for semantically relevant past memories
 3. Top-K memories are injected into the system prompt as context
-4. Gemini 3.5 Flash generates a personalized, grounded response
+4. Gemini 3.6 Flash generates a personalized, grounded response
 5. Agent automatically extracts new facts from the exchange and saves them
 6. Memory citations are displayed so the user can see what was recalled
 
@@ -45,11 +45,12 @@ You speak or type
 |-----------|---------|
 | **Python 3.10+** | Core language |
 | **Streamlit** | Web UI framework with custom CSS design system |
-| **Google Gemini 3.5 Flash** | LLM for conversation and fact extraction |
+| **Google Gemini 3.6 Flash** | Primary LLM (with multi-model fallback to 3.5 Flash Lite) |
 | **FAISS** (Meta) | Local vector database for semantic memory |
 | **Google Gemini Embedding** | Text-to-vector conversion (`gemini-embedding-2`) |
 | **LangChain** | LLM orchestration (messages, prompts, streaming) |
 | **SpeechRecognition** | Voice-to-text via Google Web Speech API |
+
 
 ## Features
 
