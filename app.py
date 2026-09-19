@@ -1393,8 +1393,15 @@ components.html(
                     ctrl.sendRecording();
                     return;
                 }
-            };
             parentDoc.addEventListener('click', parentDoc.__waVoiceClickHandler, true);
+
+            // Clean address bar so no query parameters or private IDs are exposed in the URL
+            try {
+                const parentWin = window.parent || window;
+                if (parentWin.location.search) {
+                    parentWin.history.replaceState({}, '', parentWin.location.pathname);
+                }
+            } catch (e) {}
         })(); 
     </script>
     """,
@@ -1443,22 +1450,27 @@ if "active_chat_id" not in st.session_state or st.session_state.active_chat_id n
 active_chat = st.session_state.chats[st.session_state.active_chat_id]
 st.session_state.messages = active_chat["messages"]
 
-# ── User Profile & Memory Isolation (Prevents memories leaking across devices / friends) ──
+# ── Clean URL & Multi-User Memory Isolation (Zero URL Leakage) ──
 import uuid
+import hashlib
 
+# 1. Strip any ?user= from query params so address bar remains 100% clean and private
+if "user" in st.query_params:
+    try:
+        del st.query_params["user"]
+    except Exception:
+        pass
+
+# 2. Derive unique session ID for default private isolation
 if "user_profile_id" not in st.session_state:
-    query_uid = st.query_params.get("user")
-    if query_uid:
-        st.session_state.user_profile_id = str(query_uid)
-    else:
-        # Generate new isolated 8-char user ID
-        new_uid = f"u_{uuid.uuid4().hex[:8]}"
-        st.session_state.user_profile_id = new_uid
-        st.query_params["user"] = new_uid
-else:
-    # Ensure URL query param remains synchronized
-    if st.query_params.get("user") != st.session_state.user_profile_id:
-        st.query_params["user"] = st.session_state.user_profile_id
+    try:
+        from streamlit.runtime.scriptrunner import get_script_run_ctx
+        ctx = get_script_run_ctx()
+        s_raw = ctx.session_id if ctx else str(time.time())
+        s_hash = hashlib.md5(s_raw.encode()).hexdigest()[:8]
+    except Exception:
+        s_hash = uuid.uuid4().hex[:8]
+    st.session_state.user_profile_id = f"s_{s_hash}"
 
 current_uid = st.session_state.user_profile_id
 
@@ -1600,20 +1612,42 @@ with st.sidebar:
             st.toast("Vector memory reset!")
             st.rerun()
 
-    with st.expander("Vault Privacy & Profile", expanded=False):
+    with st.expander("Vault Sync & Privacy", expanded=False):
         st.markdown(f"""
         <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 8px;">
-            <div><strong>Profile ID:</strong> <code>{current_uid}</code></div>
-            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">Each device/user has an isolated vault. Memories are completely private to your profile.</div>
+            <div><strong>Active Vault:</strong> <code>{current_uid}</code></div>
+            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">URL is 100% clean and private. To sync your memories across multiple devices without exposing anything in the URL, enter your private Vault Key below.</div>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Start New Private Vault", icon=":material/lock_reset:", key="btn_new_vault", use_container_width=True, help="Create a fresh isolated vault for this device"):
-            new_uid = f"u_{uuid.uuid4().hex[:8]}"
-            st.session_state.user_profile_id = new_uid
-            st.query_params["user"] = new_uid
-            st.session_state.memory_store = MemoryStore(user_id=new_uid)
-            st.toast("Switched to fresh private vault!")
-            st.rerun()
+
+        vault_key_val = st.text_input(
+            "Private Vault Passphrase",
+            value=st.session_state.get("custom_vault_key", ""),
+            placeholder="e.g. rishi-vault",
+            help="Enter your private key to sync memories across devices safely.",
+            label_visibility="collapsed"
+        )
+        col_v1, col_v2 = st.columns(2)
+        with col_v1:
+            if st.button("Connect Key", icon=":material/key:", use_container_width=True, key="btn_connect_vault"):
+                clean_key = "".join(c for c in vault_key_val.strip() if c.isalnum() or c in ("-", "_")).lower()
+                if clean_key:
+                    st.session_state.custom_vault_key = clean_key
+                    st.session_state.user_profile_id = f"v_{clean_key}"
+                    st.session_state.memory_store = MemoryStore(user_id=st.session_state.user_profile_id)
+                    st.toast(f"Connected to private vault: {clean_key}")
+                    st.rerun()
+                else:
+                    st.warning("Please enter a valid key.")
+        with col_v2:
+            if st.button("New Session", icon=":material/lock_reset:", use_container_width=True, key="btn_new_vault", help="Reset to a fresh isolated session"):
+                import uuid
+                new_uid = f"s_{uuid.uuid4().hex[:8]}"
+                st.session_state.user_profile_id = new_uid
+                st.session_state.custom_vault_key = ""
+                st.session_state.memory_store = MemoryStore(user_id=new_uid)
+                st.toast("Switched to fresh private session!")
+                st.rerun()
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
 
