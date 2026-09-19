@@ -50,7 +50,8 @@ st.markdown("""
     
     [data-testid="stMainBlockContainer"] {
         padding: 1rem 1rem 2rem 1rem !important;
-        max-width: 100% !important;
+        max-width: 860px !important;
+        margin: 0 auto !important;
     }
 
     #MainMenu, [data-testid="stHeader"], [data-testid="stFooter"] { 
