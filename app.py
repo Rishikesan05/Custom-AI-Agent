@@ -6,6 +6,9 @@ import speech_recognition as sr
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
+import importlib
+import memory
+importlib.reload(memory)
 from memory import MemoryStore
 import ast
 
@@ -1440,8 +1443,27 @@ if "active_chat_id" not in st.session_state or st.session_state.active_chat_id n
 active_chat = st.session_state.chats[st.session_state.active_chat_id]
 st.session_state.messages = active_chat["messages"]
 
-if "memory_store" not in st.session_state or not hasattr(st.session_state.memory_store, "get_all_memories"):
-    st.session_state.memory_store = MemoryStore()
+# ── User Profile & Memory Isolation (Prevents memories leaking across devices / friends) ──
+import uuid
+
+if "user_profile_id" not in st.session_state:
+    query_uid = st.query_params.get("user")
+    if query_uid:
+        st.session_state.user_profile_id = str(query_uid)
+    else:
+        # Generate new isolated 8-char user ID
+        new_uid = f"u_{uuid.uuid4().hex[:8]}"
+        st.session_state.user_profile_id = new_uid
+        st.query_params["user"] = new_uid
+else:
+    # Ensure URL query param remains synchronized
+    if st.query_params.get("user") != st.session_state.user_profile_id:
+        st.query_params["user"] = st.session_state.user_profile_id
+
+current_uid = st.session_state.user_profile_id
+
+if "memory_store" not in st.session_state or getattr(st.session_state.memory_store, "user_id", None) != current_uid:
+    st.session_state.memory_store = MemoryStore(user_id=current_uid)
 if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
@@ -1576,6 +1598,21 @@ with st.sidebar:
         if st.button("Reset All", use_container_width=True, help="Clear all stored facts in FAISS"):
             st.session_state.memory_store.clear_memory()
             st.toast("Vector memory reset!")
+            st.rerun()
+
+    with st.expander("Vault Privacy & Profile", expanded=False):
+        st.markdown(f"""
+        <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 8px;">
+            <div><strong>Profile ID:</strong> <code>{current_uid}</code></div>
+            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">Each device/user has an isolated vault. Memories are completely private to your profile.</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Start New Private Vault", icon=":material/lock_reset:", key="btn_new_vault", use_container_width=True, help="Create a fresh isolated vault for this device"):
+            new_uid = f"u_{uuid.uuid4().hex[:8]}"
+            st.session_state.user_profile_id = new_uid
+            st.query_params["user"] = new_uid
+            st.session_state.memory_store = MemoryStore(user_id=new_uid)
+            st.toast("Switched to fresh private vault!")
             st.rerun()
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)

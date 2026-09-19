@@ -4,12 +4,23 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 class MemoryStore:
-    def __init__(self, index_path="memory_index"):
-        self.index_path = index_path
+    def __init__(self, user_id="default", base_dir="memory_index"):
+        self.user_id = str(user_id) if user_id else "default"
+        self.base_dir = base_dir
+        
+        # Isolate storage per user/device so memories never bleed across users
+        if self.user_id and self.user_id != "default":
+            safe_uid = "".join(c for c in self.user_id if c.isalnum() or c in ("-", "_"))
+            self.index_path = os.path.join(self.base_dir, safe_uid)
+        else:
+            self.index_path = self.base_dir
+            
+        os.makedirs(self.index_path, exist_ok=True)
         self.embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-2")
         
         # Load existing memory if available
-        if os.path.exists(self.index_path):
+        index_file = os.path.join(self.index_path, "index.faiss")
+        if os.path.exists(index_file):
             self.vector_store = FAISS.load_local(
                 self.index_path, 
                 self.embeddings,
@@ -18,6 +29,7 @@ class MemoryStore:
         else:
             # Initialize with a dummy document so it's ready to add and save
             self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
+            self.vector_store.save_local(self.index_path)
 
     def save_memory(self, memory_text: str):
         """Save a new memory text into the FAISS index."""
