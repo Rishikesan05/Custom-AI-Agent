@@ -55,8 +55,13 @@ st.markdown("""
         margin: 0 auto !important;
     }
 
-    #MainMenu, [data-testid="stHeader"], [data-testid="stFooter"] { 
+    #MainMenu, [data-testid="stFooter"] { 
         display: none !important; 
+    }
+    
+    /* Make header transparent so the sidebar toggle is visible but the header is clean */
+    [data-testid="stHeader"] {
+        background: transparent !important;
     }
     a.header-anchor, [data-testid="stMarkdownContainer"] h1 a, [data-testid="stMarkdownContainer"] h2 a { display: none !important; }
 
