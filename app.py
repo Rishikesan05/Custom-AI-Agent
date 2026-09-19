@@ -358,13 +358,16 @@ st.markdown("""
         }
     }
 
-    /* Align Streamlit bottom bar */
-    [data-testid="stBottom"] {
+    /* Align Streamlit bottom bar & eliminate grey background band */
+    [data-testid="stBottom"],
+    [data-testid="stBottom"] > div {
         background: transparent !important;
+        background-color: transparent !important;
+    }
+    [data-testid="stBottom"] {
         padding: 0 0 12px 0 !important;
         pointer-events: auto !important;
     }
-    [data-testid="stBottom"] > div,
     [data-testid="stBottomBlockContainer"] {
         max-width: 760px !important;
         margin: 0 auto !important;
@@ -374,6 +377,8 @@ st.markdown("""
         gap: 10px !important;
         position: relative !important;
         box-sizing: border-box !important;
+        background: transparent !important;
+        background-color: transparent !important;
     }
 
     /* 1. Chat Input Field */
