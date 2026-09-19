@@ -6,8 +6,48 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from memory import MemoryStore
+import ast
 
 load_dotenv()
+
+def extract_text_content(content):
+    """Extract clean readable text from langchain/gemini chunks or responses."""
+    if not content:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict):
+                parts.append(item.get("text", ""))
+            elif isinstance(item, str):
+                parts.append(item)
+            elif hasattr(item, "text"):
+                parts.append(getattr(item, "text", ""))
+        return "".join(parts)
+    if isinstance(content, dict):
+        return content.get("text", "")
+    if hasattr(content, "text"):
+        return getattr(content, "text", "")
+    return str(content)
+
+def clean_display_text(text):
+    """Clean up and recover human-readable text from any stringified raw dict chunks."""
+    if not isinstance(text, str):
+        return extract_text_content(text)
+    if "{'type':" in text or '{"type":' in text:
+        parts = []
+        for match in re.finditer(r"'text':\s*('(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\")", text):
+            val = match.group(1)
+            try:
+                parts.append(ast.literal_eval(val))
+            except Exception:
+                parts.append(val[1:-1])
+        if parts:
+            return "".join(parts)
+    return text
+
 
 st.set_page_config(
     page_title="Custom AI Agent",
@@ -440,7 +480,9 @@ st.markdown("""
         background: transparent !important;
     }
 
-    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]) {
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="user"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="human"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="user"]) {
         background: var(--surface-2) !important;
         color: var(--ink) !important;
         margin-left: auto;
@@ -448,16 +490,26 @@ st.markdown("""
         max-width: 85%;
     }
 
-    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) {
+    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="assistant"]),
+    .stChatMessage[data-testid="stChatMessage"]:has([aria-label*="ai"]) {
         background: var(--surface-1) !important;
         margin-right: auto;
         max-width: 95%;
         padding-left: 0 !important;
     }
     
-    .stChatMessage[data-testid="stChatMessage"]:has([data-testid*="assistant"]) [data-testid="stChatAvatar"] {
+    [data-testid="stChatMessage"] [data-testid="stChatAvatar"],
+    [data-testid="stChatMessage"] [data-testid*="stChatMessageAvatar"] {
         background: transparent !important;
-        font-size: 24px;
+        border-radius: 10px !important;
+    }
+
+    [data-testid="stChatMessage"] img {
+        border-radius: 10px !important;
+        width: 36px !important;
+        height: 36px !important;
+        object-fit: contain !important;
     }
 
 
@@ -924,8 +976,8 @@ if not st.session_state.messages:
 
 # ── Chat Display ──
 for msg in st.session_state.messages:
-    avatar = "user" if msg.type == "human" else "assistant"
-    with st.chat_message(msg.type, avatar=avatar):
+    avatar_icon = "assets/user.svg" if msg.type == "human" else "assets/assistant.svg"
+    with st.chat_message(msg.type, avatar=avatar_icon):
         if msg.type == "ai":
             recalled = getattr(msg, "additional_kwargs", {}).get("recalled", "")
             if recalled:
@@ -944,7 +996,7 @@ for msg in st.session_state.messages:
                 </details>
                 """, unsafe_allow_html=True)
 
-        st.markdown(msg.content)
+        st.markdown(clean_display_text(msg.content))
 
         if msg.type == "ai":
             latency = getattr(msg, "additional_kwargs", {}).get("latency")
@@ -1032,10 +1084,10 @@ if query:
     active_chat["messages"].append(HumanMessage(content=query))
     st.session_state.messages = active_chat["messages"]
     
-    with st.chat_message("human", avatar="user"):
-        st.markdown(query)
+    with st.chat_message("human", avatar="assets/user.svg"):
+        st.markdown(clean_display_text(query))
 
-    with st.chat_message("ai", avatar="assistant"):
+    with st.chat_message("ai", avatar="assets/assistant.svg"):
         start_time = time.time()
 
         # 1. Recall relevant memories
@@ -1073,11 +1125,10 @@ if query:
 
         try:
             for chunk in llm.stream(messages):
-                content = chunk.content
-                if isinstance(content, list):
-                    content = "".join(str(c) for c in content)
-                full_response += str(content)
-                response_placeholder.markdown(full_response + "▌")
+                piece = extract_text_content(chunk.content)
+                if piece:
+                    full_response += piece
+                    response_placeholder.markdown(full_response + "▌")
 
             response_placeholder.markdown(full_response)
             latency = time.time() - start_time
@@ -1087,9 +1138,7 @@ if query:
             # 4. Auto-extract and save new memory
             extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
             fact_content = llm.invoke(extract_prompt).content
-            if isinstance(fact_content, list):
-                fact_content = "".join(str(c) for c in fact_content)
-            fact = str(fact_content).strip()
+            fact = extract_text_content(fact_content).strip()
 
             if fact and "NONE" not in fact.upper():
                 st.session_state.memory_store.save_memory(fact)
