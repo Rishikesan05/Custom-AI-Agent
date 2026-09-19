@@ -176,7 +176,7 @@ st.markdown("""
     }
     
     [data-testid="stMainBlockContainer"] {
-        padding: 1.25rem 1.5rem 160px 1.5rem !important;
+        padding: 1.5rem 1.5rem 75px 1.5rem !important;
         max-width: 860px !important;
         margin: 0 auto !important;
     }
@@ -234,8 +234,8 @@ st.markdown("""
     /* Sidebar Collapse Button inside Sidebar */
     [data-testid="stSidebarCollapseButton"] {
         position: absolute !important;
-        top: 10px !important;
-        right: 12px !important;
+        top: 18px !important;
+        right: 14px !important;
         z-index: 100 !important;
     }
     [data-testid="stSidebarCollapseButton"] button {
@@ -256,7 +256,7 @@ st.markdown("""
         border-color: var(--ink-subtle) !important;
     }
 
-    /* Sidebar Styling & Top Gap Elimination */
+    /* Sidebar Styling & Balanced Spacing */
     [data-testid="stSidebar"] {
         background-color: var(--surface-2) !important;
         border-right: 1px solid var(--hairline) !important;
@@ -271,8 +271,10 @@ st.markdown("""
     [data-testid="stLogoSpacer"] {
         display: none !important;
     }
-    [data-testid="stSidebarUserContent"] {
-        padding-top: 10px !important;
+    [data-testid="stSidebarUserContent"],
+    [data-testid="stSidebarContent"] {
+        padding-top: 18px !important;
+        padding-bottom: 20px !important;
         padding-left: 14px !important;
         padding-right: 14px !important;
     }
@@ -283,7 +285,7 @@ st.markdown("""
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         [data-testid="stMainBlockContainer"] {
-            padding: 1rem 0.75rem 190px 0.75rem !important;
+            padding: 1rem 0.75rem 90px 0.75rem !important;
         }
         h1 {
             font-size: 28px !important;
@@ -298,7 +300,7 @@ st.markdown("""
     /* Align Streamlit bottom bar */
     [data-testid="stBottom"] {
         background: transparent !important;
-        padding: 0 0 20px 0 !important;
+        padding: 0 0 12px 0 !important;
         pointer-events: auto !important;
     }
     [data-testid="stBottom"] > div,
@@ -1569,19 +1571,19 @@ if not st.session_state.messages:
         greeting_time = "Welcome back"
 
     st.markdown(f"""
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 4vh; text-align: center; animation: fadeIn 0.8s ease;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 2vh; text-align: center; animation: fadeIn 0.8s ease;">
         <div class="hero-aura">
             <div class="hero-logo-box">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
             </div>
         </div>
         <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--ink); font-size: 36px; letter-spacing: -0.03em; margin: 0 0 8px 0;">{greeting_time}</h1>
-        <p style="color: var(--ink-muted); font-size: 16px; max-width: 540px; line-height: 1.5; margin: 0 0 32px 0;">Where should we begin? Type a message or click the mic to speak.</p>
+        <p style="color: var(--ink-muted); font-size: 16px; max-width: 540px; line-height: 1.5; margin: 0 0 18px 0;">Where should we begin? Type a message or click the mic to speak.</p>
     </div>
     <style>@keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(10px); }} to {{ opacity: 1; transform: translateY(0); }} }}</style>
     """, unsafe_allow_html=True)
     
-    st.markdown("<div class='suggestion-grid' style='max-width: 760px; margin: 0 auto 32px auto;'>", unsafe_allow_html=True)
+    st.markdown("<div class='suggestion-grid' style='max-width: 760px; margin: 0 auto 16px auto;'>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Memory: What do you remember about me?", icon=":material/psychology:", key="chip_mem", use_container_width=True):
