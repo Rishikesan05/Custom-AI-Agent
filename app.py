@@ -18,29 +18,9 @@ st.set_page_config(
 
 from datetime import datetime
 
-# ── Theme State ──
-if "theme" not in st.session_state:
-    st.session_state.theme = "light"
-
-is_dark = (st.session_state.theme == "dark")
-
-root_theme_vars = """
-    :root {
-        --surface-1: #090d16;
-        --surface-2: #0f172a;
-        --surface-3: #1e293b;
-        --hairline: #1e293b;
-        --primary: #6366f1;
-        --ink: #f8fafc;
-        --ink-muted: #94a3b8;
-        --ink-subtle: #64748b;
-        --radius: 14px;
-        --radius-lg: 20px;
-        --radius-pill: 9999px;
-        --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-        --shadow-floating: 0 14px 30px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-    }
-""" if is_dark else """
+# ── CSS Design System ──
+st.markdown("""
+<style>
     :root {
         --surface-1: #ffffff;
         --surface-2: #f8fafc;
@@ -56,10 +36,8 @@ root_theme_vars = """
         --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         --shadow-floating: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
     }
-"""
-
-# ── CSS Design System ──
-st.markdown(f"<style>{root_theme_vars}</style>", unsafe_allow_html=True)
+</style>
+""", unsafe_allow_html=True)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
@@ -668,16 +646,6 @@ components.html(
                 delay: 0.3
             });
             
-            // Sidebar Elements
-            gsap.from(parent.querySelectorAll('[data-testid="stSidebar"] *'), {
-                x: -10,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.02,
-                ease: "power2.out",
-                delay: 0.2
-            });
-            
             // Animate Chat Input Bar
             gsap.from(parent.querySelectorAll('.stChatInput'), {
                 y: 20,
@@ -906,12 +874,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # 7. Obsidian Dark / Light Theme Toggle
-    theme_icon = ":material/light_mode:" if is_dark else ":material/dark_mode:"
-    theme_btn_text = "Switch to Light Mode" if is_dark else "Switch to Dark Mode"
-    if st.button(theme_btn_text, icon=theme_icon, key="theme_toggle_btn", use_container_width=True, help="Toggle Obsidian Dark or Studio Light visual theme"):
-        st.session_state.theme = "light" if is_dark else "dark"
-        st.rerun()
+
 
 # ── Main Chat Area Header (Empty State) ──
 if not st.session_state.messages:
@@ -939,7 +902,7 @@ if not st.session_state.messages:
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
             </div>
         </div>
-        <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--ink); font-size: 36px; letter-spacing: -0.03em; margin: 0 0 8px 0;">{greeting_time}, Rishikesan</h1>
+        <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--ink); font-size: 36px; letter-spacing: -0.03em; margin: 0 0 8px 0;">{greeting_time}</h1>
         <p style="color: var(--ink-muted); font-size: 16px; max-width: 540px; line-height: 1.5; margin: 0 0 32px 0;">Your autonomous AI assistant powered by Gemini 3.5 Flash with persistent long-term semantic memory across conversations.</p>
     </div>
     <style>@keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(10px); }} to {{ opacity: 1; transform: translateY(0); }} }}</style>
@@ -1110,7 +1073,10 @@ if query:
 
         try:
             for chunk in llm.stream(messages):
-                full_response += chunk.content
+                content = chunk.content
+                if isinstance(content, list):
+                    content = "".join(str(c) for c in content)
+                full_response += str(content)
                 response_placeholder.markdown(full_response + "▌")
 
             response_placeholder.markdown(full_response)
@@ -1120,7 +1086,10 @@ if query:
 
             # 4. Auto-extract and save new memory
             extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
-            fact = llm.invoke(extract_prompt).content.strip()
+            fact_content = llm.invoke(extract_prompt).content
+            if isinstance(fact_content, list):
+                fact_content = "".join(str(c) for c in fact_content)
+            fact = str(fact_content).strip()
 
             if fact and "NONE" not in fact.upper():
                 st.session_state.memory_store.save_memory(fact)
