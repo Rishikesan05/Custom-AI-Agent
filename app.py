@@ -918,11 +918,58 @@ components.html(
                 if (chatInput.parentNode !== wrapper) wrapper.appendChild(chatInput);
                 if (bar.parentNode !== wrapper) wrapper.appendChild(bar);
                 if (micBtn.parentNode !== wrapper) wrapper.appendChild(micBtn);
-            }
 
-            // Mount immediately and monitor DOM changes
-            mountDockElements();
-            setInterval(mountDockElements, 400);
+                // Direct binding on the buttons to ensure reliable clicks regardless of iframe lifecycle
+                micBtn.onclick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    startRecording();
+                };
+
+                chatBtn.onclick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    revertDockToIdle();
+                };
+
+                const trashBtn = bar.querySelector('#wa-btn-trash');
+                if (trashBtn) {
+                    trashBtn.onclick = (e) => {
+                        if (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        currentTranscript = '';
+                        revertDockToIdle();
+                    };
+                }
+
+                const pauseBtn = bar.querySelector('#wa-btn-pause');
+                if (pauseBtn) {
+                    pauseBtn.onclick = (e) => {
+                        if (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        togglePause();
+                    };
+                }
+
+                const sendBtn = bar.querySelector('#wa-btn-send');
+                if (sendBtn) {
+                    sendBtn.onclick = (e) => {
+                        if (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        sendRecording();
+                    };
+                }
+            }
 
             // Voice Recording State
             let isRecording = false;
@@ -947,13 +994,16 @@ components.html(
                 isPaused = false;
                 clearInterval(timerInterval);
                 cancelAnimationFrame(animFrame);
+                currentTranscript = '';
 
                 if (recognition) {
                     try { recognition.stop(); } catch(e) {}
                     recognition = null;
                 }
                 if (audioStream) {
-                    audioStream.getTracks().forEach(t => t.stop());
+                    try {
+                        audioStream.getTracks().forEach(t => t.stop());
+                    } catch(e) {}
                     audioStream = null;
                 }
                 if (audioCtx && audioCtx.state !== 'closed') {
@@ -1039,11 +1089,16 @@ components.html(
                             currentTranscript = text.trim();
                         };
                         recognition.onerror = (evt) => {
+                            if (evt.error === 'no-speech') return;
                             console.warn("Speech recognition warning:", evt.error);
                         };
                         recognition.onend = () => {
                             if (isRecording && !isPaused) {
-                                try { recognition.start(); } catch(e) {}
+                                setTimeout(() => {
+                                    if (isRecording && !isPaused && recognition) {
+                                        try { recognition.start(); } catch(e) {}
+                                    }
+                                }, 250);
                             }
                         };
                         recognition.start();
@@ -1119,6 +1174,10 @@ components.html(
                 }
             }
 
+            // Mount immediately and monitor DOM changes
+            mountDockElements();
+            setInterval(mountDockElements, 300);
+
             // Expose active controller to parent window
             parentWin.__waDockController = {
                 startRecording,
@@ -1126,56 +1185,59 @@ components.html(
                 sendRecording,
                 revertDockToIdle
             };
+            parentWin.__startVoiceRec = startRecording;
 
-            // Global delegated event listener on parent document
-            if (!parentDoc.__waVoiceDelegationInstalled) {
-                parentDoc.__waVoiceDelegationInstalled = true;
-                parentDoc.addEventListener('click', (e) => {
-                    const ctrl = parentWin.__waDockController;
-                    if (!ctrl) return;
-
-                    const micTarget = e.target.closest('#wa-mic-btn');
-                    if (micTarget) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        ctrl.startRecording();
-                        return;
-                    }
-
-                    const chatMinTarget = e.target.closest('#wa-chat-min-btn');
-                    if (chatMinTarget) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        ctrl.revertDockToIdle();
-                        return;
-                    }
-
-                    const trashTarget = e.target.closest('#wa-btn-trash');
-                    if (trashTarget) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        currentTranscript = '';
-                        ctrl.revertDockToIdle();
-                        return;
-                    }
-
-                    const pauseTarget = e.target.closest('#wa-btn-pause');
-                    if (pauseTarget) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        ctrl.togglePause();
-                        return;
-                    }
-
-                    const sendTarget = e.target.closest('#wa-btn-send');
-                    if (sendTarget) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        ctrl.sendRecording();
-                        return;
-                    }
-                }, true);
+            // Manage parent document delegated click handler cleanly
+            if (parentDoc.__waVoiceClickHandler) {
+                try {
+                    parentDoc.removeEventListener('click', parentDoc.__waVoiceClickHandler, true);
+                } catch(e) {}
             }
+            parentDoc.__waVoiceClickHandler = (e) => {
+                const ctrl = parentWin.__waDockController;
+                if (!ctrl) return;
+
+                const micTarget = e.target.closest('#wa-mic-btn');
+                if (micTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ctrl.startRecording();
+                    return;
+                }
+
+                const chatMinTarget = e.target.closest('#wa-chat-min-btn');
+                if (chatMinTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ctrl.revertDockToIdle();
+                    return;
+                }
+
+                const trashTarget = e.target.closest('#wa-btn-trash');
+                if (trashTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ctrl.revertDockToIdle();
+                    return;
+                }
+
+                const pauseTarget = e.target.closest('#wa-btn-pause');
+                if (pauseTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ctrl.togglePause();
+                    return;
+                }
+
+                const sendTarget = e.target.closest('#wa-btn-send');
+                if (sendTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ctrl.sendRecording();
+                    return;
+                }
+            };
+            parentDoc.addEventListener('click', parentDoc.__waVoiceClickHandler, true);
         })(); 
     </script>
     """,
