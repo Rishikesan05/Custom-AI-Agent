@@ -11,6 +11,10 @@ A production-grade conversational AI assistant engineered with **persistent sema
 
 On subsequent interactions, the agent executes sub-millisecond semantic similarity searches to recall relevant facts and augment its system prompts—delivering a permanently personalized, grounded conversation across sessions. To guarantee privacy on shared cloud servers (e.g., Streamlit Cloud), the system implements a **client-side `localStorage` vault bridge** that delivers multi-user isolation with **zero URL credential leakage**.
 
+<p align="center">
+  <img src="assets/demo.png" alt="Custom AI Agent UI Preview" width="100%" />
+</p>
+
 ---
 
 ## 🏗️ Architecture Overview
