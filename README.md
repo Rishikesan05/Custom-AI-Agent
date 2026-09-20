@@ -61,6 +61,7 @@ A production-grade conversational AI assistant engineered with **persistent sema
 
 ### 1. Long-Term Semantic Memory (RAG Pipeline)
 - **Autonomous Fact Extraction:** After each conversation turn, the agent evaluates the exchange. If durable personal facts (name, career, preferences, projects) are detected, it extracts and commits them to the vector store.
+- **Smart Two-Stage Deduplication:** Prevents duplicate memory accumulation via exact string matching and FAISS vector distance threshold checks ($\le 0.22$). If a fact is already known or paraphrased, it is automatically skipped.
 - **Semantic Retrieval:** When queries are submitted, the agent runs cosine similarity against stored vectors. Even if queries share zero identical keywords (e.g., *"What do I do for work?"* matching *"Loves building AI agents"*), the relevant memories are accurately recalled.
 - **Citation Transparency:** An expandable citation chip appears above responses, listing precisely which past facts were recalled to generate the answer.
 
