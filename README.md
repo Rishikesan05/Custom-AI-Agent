@@ -1,6 +1,7 @@
 # Custom AI Agent with Long-Term Semantic Memory & Device-Persistent Vaults
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://aiagent-rishiware.streamlit.app/)
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC_BY--NC--ND_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![LangChain](https://img.shields.io/badge/Orchestration-LangChain%20Core-green)](https://python.langchain.com/)
 [![FAISS](https://img.shields.io/badge/Vector%20DB-FAISS%20Index-orange)](https://github.com/facebookresearch/faiss)
