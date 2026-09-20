@@ -1659,12 +1659,12 @@ with st.sidebar:
 
     with st.expander("Vault Settings & Identity", expanded=False):
         is_editing = st.session_state.get("is_editing_vault", False)
-        col_v1, col_v2 = st.columns([0.82, 0.18], vertical_alignment="center")
+        col_v1, col_v2, col_v3 = st.columns([0.74, 0.13, 0.13], vertical_alignment="center", gap="small")
         with col_v1:
             st.markdown(f"""
-            <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted);">
-                <span style="font-weight: 600;">Active Vault:</span>
-                <code style="color: var(--brand-primary); font-size: 12px; font-weight: 700; background: var(--surface-2); padding: 2px 7px; border-radius: 6px;">{current_vault}</code>
+            <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <span style="font-weight: 600;">Vault:</span>
+                <code style="color: var(--brand-primary); font-size: 11.5px; font-weight: 700; background: var(--surface-2); padding: 2px 6px; border-radius: 6px; white-space: nowrap;">{current_vault}</code>
             </div>
             """, unsafe_allow_html=True)
         with col_v2:
@@ -1672,6 +1672,15 @@ with st.sidebar:
             toggle_help = "Cancel editing" if is_editing else "Rename Vault ID"
             if st.button("", icon=toggle_icon, key="toggle_edit_vault_btn", help=toggle_help):
                 st.session_state.is_editing_vault = not is_editing
+                st.rerun()
+        with col_v3:
+            if st.button("", icon=":material/add:", key="btn_create_fresh_vault", help="Create fresh new vault"):
+                fresh_id = f"user-{uuid.uuid4().hex[:4]}"
+                st.session_state.vault_id = fresh_id
+                st.session_state.vault_just_switched = True
+                st.session_state.memory_store = MemoryStore(user_id=fresh_id)
+                st.session_state.is_editing_vault = False
+                st.toast(f"Created fresh vault: {fresh_id}")
                 st.rerun()
 
         st.markdown("<div style='font-size: 10px; color: var(--ink-subtle); margin-top: 2px; margin-bottom: 8px;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
@@ -1699,13 +1708,16 @@ with st.sidebar:
 
             st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 8px 0;'>", unsafe_allow_html=True)
         else:
-            st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 6px 0 10px 0;'>", unsafe_allow_html=True)
+            st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 6px 0 8px 0;'>", unsafe_allow_html=True)
 
-        # 2. Connect to another Vault
+        # 2. Connect to another Vault (Single-row input + connect)
         with st.form(key="connect_vault_form", border=False):
-            st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>CONNECT TO ANOTHER VAULT</div>", unsafe_allow_html=True)
-            connect_val = st.text_input("Target Vault ID", placeholder="e.g. other-device-id", label_visibility="collapsed")
-            if st.form_submit_button("Connect Vault", icon=":material/link:", use_container_width=True):
+            col_c1, col_c2 = st.columns([0.82, 0.18], vertical_alignment="center", gap="small")
+            with col_c1:
+                connect_val = st.text_input("Target Vault ID", placeholder="Connect to Vault ID...", label_visibility="collapsed")
+            with col_c2:
+                connect_clicked = st.form_submit_button("", icon=":material/link:", help="Connect to Vault", use_container_width=True)
+            if connect_clicked:
                 clean_target = "".join(c for c in connect_val.strip() if c.isalnum() or c in ("-", "_")).lower()
                 if clean_target and clean_target != current_vault:
                     st.session_state.vault_id = clean_target
@@ -1717,17 +1729,6 @@ with st.sidebar:
                     st.info("Already connected to this vault.")
                 else:
                     st.warning("Please enter a valid Vault ID.")
-
-        st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 10px 0;'>", unsafe_allow_html=True)
-
-        # 3. Create Fresh Vault
-        if st.button("Create Fresh Vault", icon=":material/add_box:", use_container_width=True, key="btn_create_new_vault", help="Start a new blank isolated vault"):
-            fresh_id = f"user-{uuid.uuid4().hex[:4]}"
-            st.session_state.vault_id = fresh_id
-            st.session_state.vault_just_switched = True
-            st.session_state.memory_store = MemoryStore(user_id=fresh_id)
-            st.toast(f"Created fresh vault: {fresh_id}")
-            st.rerun()
 
     st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 16px 0;'>", unsafe_allow_html=True)
 
