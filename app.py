@@ -678,18 +678,21 @@ st.markdown("""
     }
 
     /* Vault Settings & Identity Compact Card Alignment */
+    div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stExpanderDetails"] {
+        padding-top: 8px !important;
+        padding-bottom: 10px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stVerticalBlock"] {
-        gap: 6px !important;
+        gap: 8px !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stHorizontalBlock"] {
         gap: 6px !important;
         align-items: center !important;
     }
-    div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stElementContainer"] {
-        margin-bottom: 0px !important;
-    }
     div[data-testid="stExpander"]:has(#vault-settings-marker) form {
-        margin-top: 4px !important;
+        margin-top: 2px !important;
         margin-bottom: 0px !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) .stButton button,
@@ -715,16 +718,33 @@ st.markdown("""
     div[data-testid="stExpander"]:has(#vault-settings-marker) .stTextInput {
         margin-bottom: 0 !important;
     }
+    div[data-testid="stExpander"]:has(#vault-settings-marker) .stTextInput label {
+        font-size: 10.5px !important;
+        font-weight: 700 !important;
+        color: var(--ink-muted) !important;
+        letter-spacing: 0.3px !important;
+        margin-bottom: 4px !important;
+    }
     div[data-testid="stExpander"]:has(#vault-settings-marker) .stTextInput > div {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stExpander"]:has(#vault-settings-marker) [data-baseweb="input"] {
         height: 38px !important;
         min-height: 38px !important;
         border-radius: 8px !important;
         border: 1px solid var(--hairline) !important;
         background: var(--surface-1) !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stExpander"]:has(#vault-settings-marker) [data-baseweb="input"]:focus-within {
+        border-color: var(--ink-subtle) !important;
+        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06) !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) .stTextInput input {
-        height: 38px !important;
-        min-height: 38px !important;
+        height: 36px !important;
+        min-height: 36px !important;
         font-size: 12.5px !important;
         padding: 0 10px !important;
     }
@@ -1711,11 +1731,11 @@ with st.sidebar:
             st.rerun()
 
     with st.expander("Vault Settings & Identity", expanded=False):
-        st.markdown("<span id='vault-settings-marker' style='display:none;'></span>", unsafe_allow_html=True)
         is_editing = st.session_state.get("is_editing_vault", False)
         col_v1, col_v2, col_v3 = st.columns([0.68, 0.16, 0.16], vertical_alignment="center", gap="small")
         with col_v1:
             st.markdown(f"""
+            <span id='vault-settings-marker' style='display:none;'></span>
             <div style="font-size: 11.5px; line-height: 1.4; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;">
                 <span style="font-weight: 600;">Vault:</span>
                 <code style="color: var(--brand-primary); font-size: 11.5px; font-weight: 700; background: var(--surface-3); padding: 2px 7px; border-radius: 6px; white-space: nowrap;">{current_vault}</code>
@@ -1742,8 +1762,7 @@ with st.sidebar:
         # 1. Rename / Edit Vault ID (Expands when edit button is clicked)
         if is_editing:
             with st.form(key="rename_vault_form", border=False):
-                st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>RENAME VAULT ID</div>", unsafe_allow_html=True)
-                new_name_val = st.text_input("New Vault ID", value=current_vault, placeholder="e.g. alex or my-vault", label_visibility="collapsed")
+                new_name_val = st.text_input("RENAME VAULT ID", value=current_vault, placeholder="e.g. alex or my-vault")
                 if st.form_submit_button("Save Vault ID", icon=":material/check:", use_container_width=True):
                     clean_new = "".join(c for c in new_name_val.strip() if c.isalnum() or c in ("-", "_")).lower()
                     if clean_new and clean_new != current_vault:
