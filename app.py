@@ -1465,7 +1465,7 @@ if "v" in st.query_params:
         pass
 
 if "vault_id" not in st.session_state:
-    st.session_state.vault_id = "default"
+    st.session_state.vault_id = f"user-{uuid.uuid4().hex[:4]}"
 
 current_vault = st.session_state.vault_id
 
@@ -1475,6 +1475,10 @@ if "uploader_key" not in st.session_state:
     st.session_state.uploader_key = 0
 
 # 2. Synchronize active vault ID with browser localStorage
+sync_action = "override" if st.session_state.get("vault_just_switched") else "sync"
+if st.session_state.get("vault_just_switched"):
+    st.session_state.vault_just_switched = False
+
 components.html(
     f"""
     <script>
@@ -1487,27 +1491,25 @@ components.html(
                 const store = getStore();
                 let localVault = store.getItem('agent_vault_id');
                 const pyVault = '{current_vault}';
+                const syncAction = '{sync_action}';
 
-                if (pyVault && pyVault !== 'default' && localVault !== pyVault) {{
+                if (syncAction === 'override') {{
+                    // User explicitly switched, renamed, or created vault -> commit to localStorage
                     store.setItem('agent_vault_id', pyVault);
                     try {{ localStorage.setItem('agent_vault_id', pyVault); }} catch(e) {{}}
-                    localVault = pyVault;
-                }} else if (localVault && localVault !== 'default' && pyVault === 'default') {{
+                }} else if (localVault && localVault !== pyVault) {{
+                    // Normal page reload: restore device's permanent vault ID to Python!
                     const u = new URL(parentWin.location.href);
                     u.searchParams.set('v', localVault);
                     parentWin.location.replace(u.href);
                     return;
-                }} else if (!localVault || localVault === 'default') {{
-                    const randHex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
-                    const newDeviceVault = 'user-' + randHex;
-                    store.setItem('agent_vault_id', newDeviceVault);
-                    try {{ localStorage.setItem('agent_vault_id', newDeviceVault); }} catch(e) {{}}
-                    const u = new URL(parentWin.location.href);
-                    u.searchParams.set('v', newDeviceVault);
-                    parentWin.location.replace(u.href);
-                    return;
+                }} else if (!localVault && pyVault) {{
+                    // First time visit on this device: save Python's generated vault ID to localStorage!
+                    store.setItem('agent_vault_id', pyVault);
+                    try {{ localStorage.setItem('agent_vault_id', pyVault); }} catch(e) {{}}
                 }}
 
+                // Clean address bar so URL remains 100% clean and private
                 if (parentWin.location.search) {{
                     parentWin.history.replaceState({{}}, '', parentWin.location.pathname);
                 }}
@@ -1675,6 +1677,7 @@ with st.sidebar:
                 if clean_new and clean_new != current_vault:
                     MemoryStore.rename_vault(current_vault, clean_new)
                     st.session_state.vault_id = clean_new
+                    st.session_state.vault_just_switched = True
                     st.session_state.memory_store = MemoryStore(user_id=clean_new)
                     st.toast(f"Vault renamed to: {clean_new}")
                     st.rerun()
@@ -1693,6 +1696,7 @@ with st.sidebar:
                 clean_target = "".join(c for c in connect_val.strip() if c.isalnum() or c in ("-", "_")).lower()
                 if clean_target and clean_target != current_vault:
                     st.session_state.vault_id = clean_target
+                    st.session_state.vault_just_switched = True
                     st.session_state.memory_store = MemoryStore(user_id=clean_target)
                     st.toast(f"Connected to vault: {clean_target}")
                     st.rerun()
@@ -1707,6 +1711,7 @@ with st.sidebar:
         if st.button("Create Fresh Vault", icon=":material/add_box:", use_container_width=True, key="btn_create_new_vault", help="Start a new blank isolated vault"):
             fresh_id = f"user-{uuid.uuid4().hex[:4]}"
             st.session_state.vault_id = fresh_id
+            st.session_state.vault_just_switched = True
             st.session_state.memory_store = MemoryStore(user_id=fresh_id)
             st.toast(f"Created fresh vault: {fresh_id}")
             st.rerun()
