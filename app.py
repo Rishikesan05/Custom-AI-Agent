@@ -358,19 +358,107 @@ st.markdown("""
         margin-bottom: 16px !important;
     }
     
-    /* Mobile Responsiveness */
+    /* Mobile Responsiveness & Polished Drawer Experience */
     @media (max-width: 768px) {
         [data-testid="stMainBlockContainer"] {
-            padding: 1rem 0.75rem 90px 0.75rem !important;
+            padding: 1rem 0.75rem 100px 0.75rem !important;
         }
         h1 {
-            font-size: 28px !important;
+            font-size: 26px !important;
+        }
+        .hero-logo-box {
+            width: 52px !important;
+            height: 52px !important;
+        }
+        .hero-aura::before {
+            width: 100px !important;
+            height: 100px !important;
         }
         .suggestion-grid .stButton > button {
-            padding: 12px 16px !important;
-            font-size: 13.5px !important;
-            min-height: 60px !important;
+            padding: 12px 14px !important;
+            font-size: 13px !important;
+            min-height: 54px !important;
         }
+
+        /* Mobile Drawer: Native 86vw width when expanded */
+        section[data-testid="stSidebar"][aria-expanded="true"] {
+            width: 86vw !important;
+            min-width: 280px !important;
+            max-width: 360px !important;
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.25) !important;
+            z-index: 99999 !important;
+        }
+        section[data-testid="stSidebar"][aria-expanded="false"] {
+            box-shadow: none !important;
+        }
+
+        /* Mobile Floating Open-Sidebar Button: Circular Icon */
+        button[data-testid="stExpandSidebarButton"]::after {
+            content: "" !important;
+            display: none !important;
+        }
+        button[data-testid="stExpandSidebarButton"] {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            top: 10px !important;
+            left: 10px !important;
+        }
+
+        /* Mobile Bottom Bar: Clean edge-to-edge padding */
+        [data-testid="stBottomBlockContainer"] {
+            padding: 0 10px !important;
+        }
+        .stChatInput > div {
+            height: 44px !important;
+            min-height: 44px !important;
+            padding: 2px 8px 2px 14px !important;
+        }
+        .stChatInput textarea {
+            font-size: 13.5px !important;
+        }
+        [data-testid="stChatInputSubmitButton"] {
+            height: 32px !important;
+            width: 32px !important;
+            min-height: 32px !important;
+            min-width: 32px !important;
+        }
+        .wa-dock-circle-btn {
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+        }
+    }
+
+    /* Sidebar Row Alignment - Prevent trash button from dropping to next line on mobile */
+    [data-testid="stSidebar"] [data-testid="stHorizontalBlock"] {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+    [data-testid="stSidebar"] div:has(> [data-testid*="chat_nav_"]) {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+    [data-testid="stSidebar"] div:has(> [data-testid*="chat_del_"]) {
+        flex: 0 0 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+    }
+    [data-testid="stSidebar"] div:has(> [data-testid*="chat_del_"]) button {
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        height: 38px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     /* Align Streamlit bottom bar & eliminate grey background band */
@@ -1654,20 +1742,21 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     if saved_chats:
-        with st.container(height=190):
+        chat_box = st.container(height=210) if len(saved_chats) > 4 else st.container()
+        with chat_box:
             for c_id, c_data in saved_chats:
                 is_active = (c_id == st.session_state.active_chat_id)
                 title_text = c_data.get("title", "Conversation")
                 display_label = title_text[:18] + "..." if len(title_text) > 20 else title_text
                 icon = ":material/chat_bubble:" if is_active else ":material/chat_bubble_outline:"
                 btn_type = "primary" if is_active else "secondary"
-                c_col1, c_col2 = st.columns([5, 1])
+                c_col1, c_col2 = st.columns([0.84, 0.16], vertical_alignment="center", gap="small")
                 with c_col1:
                     if st.button(display_label, key=f"chat_nav_{c_id}", icon=icon, use_container_width=True, type=btn_type, help=title_text):
                         st.session_state.active_chat_id = c_id
                         st.rerun()
                 with c_col2:
-                    if st.button(" ", key=f"chat_del_{c_id}", icon=":material/delete_outline:", help="Delete conversation"):
+                    if st.button(" ", key=f"chat_del_{c_id}", icon=":material/delete_outline:", help="Delete conversation", use_container_width=True):
                         del st.session_state.chats[c_id]
                         if st.session_state.active_chat_id == c_id:
                             remaining = [k for k, v in st.session_state.chats.items() if len(v.get("messages", [])) > 0]
