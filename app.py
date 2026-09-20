@@ -679,13 +679,17 @@ st.markdown("""
 
     /* Vault Settings & Identity Compact Card Alignment */
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stExpanderDetails"] {
-        padding-top: 8px !important;
-        padding-bottom: 10px !important;
+        padding-top: 6px !important;
+        padding-bottom: 8px !important;
         padding-left: 12px !important;
         padding-right: 12px !important;
     }
+    div[data-testid="stExpander"]:has(#vault-settings-marker) p {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stVerticalBlock"] {
-        gap: 8px !important;
+        gap: 6px !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stHorizontalBlock"] {
         gap: 6px !important;
@@ -1734,13 +1738,7 @@ with st.sidebar:
         is_editing = st.session_state.get("is_editing_vault", False)
         col_v1, col_v2, col_v3 = st.columns([0.68, 0.16, 0.16], vertical_alignment="center", gap="small")
         with col_v1:
-            st.markdown(f"""
-            <span id='vault-settings-marker' style='display:none;'></span>
-            <div style="font-size: 11.5px; line-height: 1.4; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;">
-                <span style="font-weight: 600;">Vault:</span>
-                <code style="color: var(--brand-primary); font-size: 11.5px; font-weight: 700; background: var(--surface-3); padding: 2px 7px; border-radius: 6px; white-space: nowrap;">{current_vault}</code>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div style="font-size: 11.5px; height: 38px; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;"><span id="vault-settings-marker" style="display:none;"></span><span style="font-weight: 600;">Vault:</span><code style="color: var(--brand-primary); font-size: 11.5px; font-weight: 700; background: var(--surface-3); padding: 2px 7px; border-radius: 6px; white-space: nowrap;">{current_vault}</code></div>', unsafe_allow_html=True)
         with col_v2:
             toggle_icon = ":material/close:" if is_editing else ":material/edit:"
             toggle_help = "Cancel editing" if is_editing else "Rename Vault ID"
@@ -1757,7 +1755,7 @@ with st.sidebar:
                 st.toast(f"Created fresh vault: {fresh_id}")
                 st.rerun()
 
-        st.markdown("<div style='font-size: 10px; color: var(--ink-subtle); line-height: 1.35; margin: 1px 0 6px 0;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 10px; color: var(--ink-subtle); line-height: 1.35; margin: 0 0 4px 0;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
 
         # 1. Rename / Edit Vault ID (Expands when edit button is clicked)
         if is_editing:
