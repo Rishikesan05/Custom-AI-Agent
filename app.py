@@ -1623,8 +1623,11 @@ with st.sidebar:
             new_fact_val = st.text_input("Fact to remember", placeholder="e.g. Loves building AI agents", label_visibility="collapsed")
             if st.form_submit_button("Save to Vault", use_container_width=True):
                 if new_fact_val and new_fact_val.strip():
-                    st.session_state.memory_store.save_memory(new_fact_val.strip())
-                    st.toast("Fact saved to vector memory!")
+                    saved = st.session_state.memory_store.save_memory(new_fact_val.strip())
+                    if saved:
+                        st.toast("Fact saved to vector memory!")
+                    else:
+                        st.toast("Fact already exists in your memory vault!")
                     st.rerun()
 
     # B. View and Delete Individual Memories
@@ -1995,16 +1998,31 @@ if query:
             active_chat["messages"].append(AIMessage(content=full_response, additional_kwargs={"recalled": past_context, "latency": latency}))
             st.session_state.messages = active_chat["messages"]
 
-            # 4. Auto-extract and save new memory (use fast lite model to preserve quota)
+            # 4. Auto-extract and save new memory (with known facts context & deduplication)
             try:
-                extract_prompt = f"Extract a concise single-sentence fact about the user to remember. If nothing specific, reply 'NONE'.\n\nUser: {query}\nAI: {full_response}\n\nFact:"
-                extract_llm = ChatGoogleGenerativeAI(model="models/gemini-3.5-flash-lite", temperature=0.2, max_retries=0)
+                known_facts = st.session_state.memory_store.get_all_memories()
+                known_context = "\n".join(f"- {m}" for m in known_facts[-8:]) if known_facts else "None"
+                extract_prompt = f"""Extract a NEW concise, single-sentence personal fact about the user to remember.
+Existing known facts:
+{known_context}
+
+CRITICAL RULES:
+1. If the user did not state any genuinely NEW personal fact, reply with 'NONE'.
+2. If the fact is already covered by the existing facts or is redundant/paraphrased, reply with 'NONE'.
+3. Do not assume, speculate, or hallucinate facts.
+
+User: {query}
+AI: {full_response}
+
+Fact:"""
+                extract_llm = ChatGoogleGenerativeAI(model="models/gemini-3.5-flash-lite", temperature=0.1, max_retries=0)
                 fact_content = extract_llm.invoke(extract_prompt).content
                 fact = extract_text_content(fact_content).strip()
 
                 if fact and "NONE" not in fact.upper():
-                    st.session_state.memory_store.save_memory(fact)
-                    st.markdown(f"<div class='mem-toast'>Learned: {fact}</div>", unsafe_allow_html=True)
+                    saved = st.session_state.memory_store.save_memory(fact, deduplicate=True)
+                    if saved:
+                        st.markdown(f"<div class='mem-toast'>Learned: {fact}</div>", unsafe_allow_html=True)
             except Exception:
                 pass
 

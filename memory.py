@@ -49,11 +49,46 @@ class MemoryStore:
                 self.vector_store = FAISS.from_texts(["Memory initialized."], self.embeddings)
                 self.vector_store.save_local(self.index_path)
 
-    def save_memory(self, memory_text: str):
-        """Save a new memory text into the FAISS index."""
-        doc = Document(page_content=memory_text)
+    def is_duplicate(self, text: str, threshold: float = 0.22) -> bool:
+        """Check if memory_text is already present or semantically identical to an existing memory."""
+        clean_text = text.strip()
+        if not clean_text or clean_text == "Memory initialized.":
+            return True
+        
+        all_mems = self.get_all_memories()
+        if not all_mems:
+            return False
+            
+        # 1. Exact string match (case-insensitive)
+        text_lower = clean_text.lower()
+        if any(m.strip().lower() == text_lower for m in all_mems):
+            return True
+            
+        # 2. Semantic similarity check via FAISS vector distance
+        try:
+            results = self.vector_store.similarity_search_with_score(clean_text, k=1)
+            if results:
+                matched_doc, distance = results[0]
+                if matched_doc.page_content != "Memory initialized." and distance <= threshold:
+                    return True
+        except Exception:
+            pass
+            
+        return False
+
+    def save_memory(self, memory_text: str, deduplicate: bool = True) -> bool:
+        """Save a new memory text into the FAISS index if not duplicate. Returns True if saved, False if skipped."""
+        clean_text = memory_text.strip()
+        if not clean_text or clean_text == "Memory initialized.":
+            return False
+            
+        if deduplicate and self.is_duplicate(clean_text):
+            return False
+            
+        doc = Document(page_content=clean_text)
         self.vector_store.add_documents([doc])
         self.vector_store.save_local(self.index_path)
+        return True
 
     def recall_memories(self, query: str, k=3) -> str:
         """Recall top-k relevant memories for a given query."""
