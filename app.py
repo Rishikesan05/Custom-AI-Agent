@@ -1658,35 +1658,48 @@ with st.sidebar:
             st.rerun()
 
     with st.expander("Vault Settings & Identity", expanded=False):
-        st.markdown(f"""
-        <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted); margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+        is_editing = st.session_state.get("is_editing_vault", False)
+        col_v1, col_v2 = st.columns([0.82, 0.18], vertical_alignment="center")
+        with col_v1:
+            st.markdown(f"""
+            <div style="font-size: 11px; line-height: 1.5; color: var(--ink-muted);">
                 <span style="font-weight: 600;">Active Vault:</span>
-                <code style="color: var(--brand-primary); font-size: 12px; font-weight: 700; background: var(--surface-2); padding: 2px 8px; border-radius: 6px;">{current_vault}</code>
+                <code style="color: var(--brand-primary); font-size: 12px; font-weight: 700; background: var(--surface-2); padding: 2px 7px; border-radius: 6px;">{current_vault}</code>
             </div>
-            <div style="font-size: 10px; color: var(--ink-subtle); margin-top: 4px;">Permanent to this device. Use this ID to sync memories across devices.</div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        with col_v2:
+            toggle_icon = ":material/close:" if is_editing else ":material/edit:"
+            toggle_help = "Cancel editing" if is_editing else "Rename Vault ID"
+            if st.button("", icon=toggle_icon, key="toggle_edit_vault_btn", help=toggle_help):
+                st.session_state.is_editing_vault = not is_editing
+                st.rerun()
 
-        # 1. Rename / Edit Vault ID
-        with st.form(key="rename_vault_form", border=False):
-            st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>RENAME VAULT ID</div>", unsafe_allow_html=True)
-            new_name_val = st.text_input("New Vault ID", value=current_vault, placeholder="e.g. alex or my-vault", label_visibility="collapsed")
-            if st.form_submit_button("Save Name", icon=":material/edit:", use_container_width=True):
-                clean_new = "".join(c for c in new_name_val.strip() if c.isalnum() or c in ("-", "_")).lower()
-                if clean_new and clean_new != current_vault:
-                    MemoryStore.rename_vault(current_vault, clean_new)
-                    st.session_state.vault_id = clean_new
-                    st.session_state.vault_just_switched = True
-                    st.session_state.memory_store = MemoryStore(user_id=clean_new)
-                    st.toast(f"Vault renamed to: {clean_new}")
-                    st.rerun()
-                elif clean_new == current_vault:
-                    st.info("Vault already has this name.")
-                else:
-                    st.warning("Please enter valid letters or numbers.")
+        st.markdown("<div style='font-size: 10px; color: var(--ink-subtle); margin-top: 2px; margin-bottom: 8px;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
 
-        st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 10px 0;'>", unsafe_allow_html=True)
+        # 1. Rename / Edit Vault ID (Expands when edit button is clicked)
+        if is_editing:
+            with st.form(key="rename_vault_form", border=False):
+                st.markdown("<div style='font-size: 10.5px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px;'>RENAME VAULT ID</div>", unsafe_allow_html=True)
+                new_name_val = st.text_input("New Vault ID", value=current_vault, placeholder="e.g. alex or my-vault", label_visibility="collapsed")
+                if st.form_submit_button("Save Vault ID", icon=":material/check:", use_container_width=True):
+                    clean_new = "".join(c for c in new_name_val.strip() if c.isalnum() or c in ("-", "_")).lower()
+                    if clean_new and clean_new != current_vault:
+                        MemoryStore.rename_vault(current_vault, clean_new)
+                        st.session_state.vault_id = clean_new
+                        st.session_state.vault_just_switched = True
+                        st.session_state.memory_store = MemoryStore(user_id=clean_new)
+                        st.session_state.is_editing_vault = False
+                        st.toast(f"Vault ID updated to: {clean_new}")
+                        st.rerun()
+                    elif clean_new == current_vault:
+                        st.session_state.is_editing_vault = False
+                        st.rerun()
+                    else:
+                        st.warning("Please enter valid letters or numbers.")
+
+            st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 8px 0;'>", unsafe_allow_html=True)
+        else:
+            st.markdown("<hr style='border: none; border-top: 1px solid var(--hairline); margin: 6px 0 10px 0;'>", unsafe_allow_html=True)
 
         # 2. Connect to another Vault
         with st.form(key="connect_vault_form", border=False):
