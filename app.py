@@ -684,12 +684,15 @@ st.markdown("""
         padding-left: 12px !important;
         padding-right: 12px !important;
     }
+    div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stMarkdownContainer"] {
+        margin-bottom: 0px !important;
+    }
     div[data-testid="stExpander"]:has(#vault-settings-marker) p {
         margin: 0 !important;
         padding: 0 !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stVerticalBlock"] {
-        gap: 6px !important;
+        gap: 8px !important;
     }
     div[data-testid="stExpander"]:has(#vault-settings-marker) [data-testid="stHorizontalBlock"] {
         gap: 6px !important;
@@ -1755,7 +1758,7 @@ with st.sidebar:
                 st.toast(f"Created fresh vault: {fresh_id}")
                 st.rerun()
 
-        st.markdown("<div style='font-size: 10px; color: var(--ink-subtle); line-height: 1.35; margin: 0 0 4px 0;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 10.5px; color: var(--ink-subtle); line-height: 1.4; padding: 2px 0 4px 0;'>Permanent to this device. Use this ID to sync memories across devices.</div>", unsafe_allow_html=True)
 
         # 1. Rename / Edit Vault ID (Expands when edit button is clicked)
         if is_editing:
